@@ -15,52 +15,52 @@ class StringProcessingTestBase(unittest.TestCase):
         r"out1 'two escaped escapes: \\\\ ' out2",
         r"out1 'escaped-quote at end:   \'' out2",
         r"out1 'escaped-escape at end:  \\' out2",
-        r"out1           'str1' out2 'str2' out2",
+        "out1           'str1' out2 'str2' out2",
         r"out1 \'        'str1' out2 'str2' out2",
         r"out1 \\\'      'str1' out2 'str2' out2",
         r"out1 \\        'str1' out2 'str2' out2",
         r"out1 \\\\      'str1' out2 'str2' out2",
         r"out1         \\'str1' out2 'str2' out2",
         r"out1       \\\\'str1' out2 'str2' out2",
-        r"out1           'str1''str2''str3' out2",
-        r"",
-        r"out1 out2 out3",
+        "out1           'str1''str2''str3' out2",
+        "",
+        "out1 out2 out3",
         bs,
         2 * bs]
 
     # Test string for multi-pattern tests (since we want to variate the
     # pattern, not the test string).
     multi_pattern_test_string = (r"abcabccba###\\13q4ujsabbc\+'**'ac"
-                                 r"###.#.####-ba")
+                                  "###.#.####-ba")
     # Multiple patterns for the multi-pattern tests.
-    multi_patterns = [r"abc",
-                      r"ab",
-                      r"ab|ac",
+    multi_patterns = ["abc",
+                      "ab",
+                      "ab|ac",
                       2 * bs,
-                      r"#+",
-                      r"(a)|(b)|(#.)",
-                      r"(?:a(b)*c)+",
+                      "#+",
+                      "(a)|(b)|(#.)",
+                      "(?:a(b)*c)+",
                       r"1|\+"]
 
     # Test strings for the remove_empty_matches feature (alias auto-trim).
-    auto_trim_test_pattern = r";"
-    auto_trim_test_strings = [r";;;;;;;;;;;;;;;;",
+    auto_trim_test_pattern = ";"
+    auto_trim_test_strings = [";;;;;;;;;;;;;;;;",
                               r"\\;\\\\\;\\#;\\\';;\;\\\\;+ios;;",
-                              r"1;2;3;4;5;6;",
-                              r"1;2;3;4;5;6;7",
-                              r"",
-                              r"Hello world",
+                              "1;2;3;4;5;6;",
+                              "1;2;3;4;5;6;7",
+                              "",
+                              "Hello world",
                               r"\;",
                               r"\\;",
-                              r"abc;a;;;;;asc"]
+                              "abc;a;;;;;asc"]
 
     # Test strings for search-in-between functions.
     search_in_between_begin_pattern = r"("
     search_in_between_end_pattern = r")"
     search_in_between_test_strings = [
-        r"()assk(This is a word)and((in a word) another ) one anyway.",
-        r"bcc5(((((((((((((((((((1)2)3)))))))))))))))))",
-        r"Let's (do (it ) more ) complicated ) ) ) () (hello.)",
+        "()assk(This is a word)and((in a word) another ) one anyway.",
+        "bcc5(((((((((((((((((((1)2)3)))))))))))))))))",
+        "Let's (do (it ) more ) complicated ) ) ) () (hello.)",
         r"()assk\\(This\ is a word\)and((in a\\\ word\\\\\) another \)) "
             r"one anyway.",
         r"bcc5\(\(\((((((\\\(((((((((((1)2)3))\\\\\)))))))))))))\)\)",

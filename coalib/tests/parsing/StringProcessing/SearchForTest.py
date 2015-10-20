@@ -13,22 +13,22 @@ class SearchForTest(StringProcessingTestBase):
     # These are the expected results for the zero-group of the
     # returned MatchObject's.
     test_basic_expected_results = [
-        [r"out1", r"out2"],
-        [r"out1", r"out2"],
-        [r"out1", r"out2"],
-        [r"out1", r"out2"],
-        [r"out1", r"out2"],
-        [r"out1", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2"],
+        ["out1", "out2"],
+        ["out1", "out2"],
+        ["out1", "out2"],
+        ["out1", "out2"],
+        ["out1", "out2"],
+        ["out1", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2"],
         [],
-        [r"out1", r"out2"],
+        ["out1", "out2"],
         [],
         []]
 
@@ -56,12 +56,12 @@ class SearchForTest(StringProcessingTestBase):
     # Test search_for() with a simple pattern.
     def test_simple_pattern(self):
         expected_results = [
-            i * [r"'"] for i in
+            i * ["'"] for i in
                 [2, 3, 2, 2, 3, 2, 4, 5, 5, 4, 4, 4, 4, 6, 0, 0, 0, 0]]
 
         self.assertResultsEqual(
             search_for,
-            {(r"'", test_string, 0, 0, use_regex): result
+            {("'", test_string, 0, 0, use_regex): result
              for test_string, result in zip(self.test_strings,
                                             expected_results)
              for use_regex in [True, False]},
@@ -70,11 +70,11 @@ class SearchForTest(StringProcessingTestBase):
     # Test search_for() with an empty pattern.
     def test_empty_pattern(self):
         expected_results = [
-            (len(elem) + 1) * [r""] for elem in self.test_strings]
+            (len(elem) + 1) * [""] for elem in self.test_strings]
 
         self.assertResultsEqual(
             search_for,
-            {(r"", test_string, 0, 0, use_regex): result
+            {("", test_string, 0, 0, use_regex): result
              for test_string, result in zip(self.test_strings,
                                             expected_results)
              for use_regex in [True, False]},

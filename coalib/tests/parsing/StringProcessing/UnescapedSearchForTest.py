@@ -13,22 +13,22 @@ class UnescapedSearchForTest(StringProcessingTestBase):
     # These are the expected results for the zero-group of the
     # returned MatchObject's.
     test_basic_expected_results = [
-        [r"out1", r"out2"],
-        [r"out1", r"out2"],
-        [r"out1", r"out2"],
-        [r"out1", r"out2"],
-        [r"out1", r"out2"],
-        [r"out1", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2", r"out2"],
-        [r"out1", r"out2"],
+        ["out1", "out2"],
+        ["out1", "out2"],
+        ["out1", "out2"],
+        ["out1", "out2"],
+        ["out1", "out2"],
+        ["out1", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2", "out2"],
+        ["out1", "out2"],
         [],
-        [r"out1", r"out2"],
+        ["out1", "out2"],
         [],
         []]
 
@@ -56,20 +56,20 @@ class UnescapedSearchForTest(StringProcessingTestBase):
     # Test unescaped_search_for() with a simple pattern.
     def test_simple_pattern(self):
         expected_results = [
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            6 * [r"'"],
+            2 * ["'"],
+            2 * ["'"],
+            2 * ["'"],
+            2 * ["'"],
+            2 * ["'"],
+            2 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            6 * ["'"],
             [],
             [],
             [],
@@ -77,7 +77,7 @@ class UnescapedSearchForTest(StringProcessingTestBase):
 
         self.assertResultsEqual(
             unescaped_search_for,
-            {(r"'", test_string, 0, 0, use_regex): result
+            {("'", test_string, 0, 0, use_regex): result
              for test_string, result in zip(self.test_strings,
                                             expected_results)
              for use_regex in [True, False]},
@@ -91,28 +91,28 @@ class UnescapedSearchForTest(StringProcessingTestBase):
         # matched escape characters inside the result list consumed from the
         # internal regex of unescaped_search_for().
         expected_results = [
-            38 * [r""],
-            38 * [r""],
-            38 * [r""],
-            37 * [r""],
-            38 * [r""],
-            38 * [r""],
-            39 * [r""],
-            38 * [r""],
-            37 * [r""],
-            38 * [r""],
-            37 * [r""],
-            38 * [r""],
-            37 * [r""],
-            39 * [r""],
-            [r""],
-            15 * [r""],
-            [r""],
-            2 * [r""]]
+            38 * [""],
+            38 * [""],
+            38 * [""],
+            37 * [""],
+            38 * [""],
+            38 * [""],
+            39 * [""],
+            38 * [""],
+            37 * [""],
+            38 * [""],
+            37 * [""],
+            38 * [""],
+            37 * [""],
+            39 * [""],
+            [""],
+            15 * [""],
+            [""],
+            2 * [""]]
 
         self.assertResultsEqual(
             unescaped_search_for,
-            {(r"", test_string, 0, 0, use_regex): result
+            {("", test_string, 0, 0, use_regex): result
              for test_string, result in zip(self.test_strings,
                                             expected_results)
              for use_regex in [True, False]},
@@ -136,20 +136,20 @@ class UnescapedSearchForTest(StringProcessingTestBase):
     # that are also escaped.
     def test_max_match_escaping_flaw(self):
         expected_master_results = [
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            6 * [r"'"],
+            2 * ["'"],
+            2 * ["'"],
+            2 * ["'"],
+            2 * ["'"],
+            2 * ["'"],
+            2 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            4 * ["'"],
+            6 * ["'"],
             [],
             [],
             [],
@@ -157,7 +157,7 @@ class UnescapedSearchForTest(StringProcessingTestBase):
 
         self.assertResultsEqual(
             unescaped_search_for,
-            {(r"'", test_string, 0, max_match, use_regex): result
+            {("'", test_string, 0, max_match, use_regex): result
              for max_match in [1, 2, 3, 4, 5, 6, 100]
              for test_string, result in zip(
                  self.test_strings,

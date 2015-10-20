@@ -165,7 +165,7 @@ class UnescapedSearchInBetweenTest(StringProcessingTestBase):
     # Test the unescaped_search_in_between() function for its use_regex
     # parameter.
     def test_disabled_regex(self):
-        search_pattern = r"'()?"
+        search_pattern = "'()?"
         expected_results = [[] for x in range(len(self.test_strings))]
 
         self.assertResultsEqual(

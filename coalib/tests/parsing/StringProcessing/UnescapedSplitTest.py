@@ -10,24 +10,24 @@ from coalib.parsing.StringProcessing import unescaped_split
 class UnescapedSplitTest(StringProcessingTestBase):
     bs = StringProcessingTestBase.bs
 
-    test_basic_pattern = r"'"
+    test_basic_pattern = "'"
     test_basic_expected_results = [
-        [r"out1 ", r"escaped-escape:        \\ ", r" out2"],
-        [r"out1 ", r"escaped-quote:         \' ", r" out2"],
-        [r"out1 ", r"escaped-anything:      \X ", r" out2"],
-        [r"out1 ", r"two escaped escapes: \\\\ ", r" out2"],
-        [r"out1 ", r"escaped-quote at end:   \'", r" out2"],
-        [r"out1 ", r"escaped-escape at end:  " + 2 * bs, r" out2"],
-        [r"out1           ", r"str1", r" out2 ", r"str2", r" out2"],
-        [r"out1 \'        ", r"str1", r" out2 ", r"str2", r" out2"],
-        [r"out1 \\\'      ", r"str1", r" out2 ", r"str2", r" out2"],
-        [r"out1 \\        ", r"str1", r" out2 ", r"str2", r" out2"],
-        [r"out1 \\\\      ", r"str1", r" out2 ", r"str2", r" out2"],
-        [r"out1         " + 2 * bs, r"str1", r" out2 ", r"str2", r" out2"],
-        [r"out1       " + 4 * bs, r"str1", r" out2 ", r"str2", r" out2"],
-        [r"out1           ", r"str1", r"", r"str2", r"", r"str3", r" out2"],
-        [r""],
-        [r"out1 out2 out3"],
+        ["out1 ", r"escaped-escape:        \\ ", " out2"],
+        ["out1 ", r"escaped-quote:         \' ", " out2"],
+        ["out1 ", r"escaped-anything:      \X ", " out2"],
+        ["out1 ", r"two escaped escapes: \\\\ ", " out2"],
+        ["out1 ", r"escaped-quote at end:   \'", " out2"],
+        ["out1 ", "escaped-escape at end:  " + 2 * bs, " out2"],
+        ["out1           ", "str1", " out2 ", "str2", " out2"],
+        [r"out1 \'        ", "str1", " out2 ", "str2", " out2"],
+        [r"out1 \\\'      ", "str1", " out2 ", "str2", " out2"],
+        [r"out1 \\        ", "str1", " out2 ", "str2", " out2"],
+        [r"out1 \\\\      ", "str1", " out2 ", "str2", " out2"],
+        ["out1         " + 2 * bs, "str1", " out2 ", "str2", " out2"],
+        ["out1       " + 4 * bs, "str1", " out2 ", "str2", " out2"],
+        ["out1           ", "str1", "", "str2", "", "str3", " out2"],
+        [""],
+        ["out1 out2 out3"],
         [bs],
         [2 * bs]]
 
@@ -75,15 +75,15 @@ class UnescapedSplitTest(StringProcessingTestBase):
     # Test the unescaped_split() function with different regex patterns.
     def test_regex_pattern(self):
         expected_results = [
-            [r"", r"", r"cba###\\13q4ujsabbc\+'**'ac###.#.####-ba"],
-            [r"", r"c", r"ccba###\\13q4ujs", r"bc\+'**'ac###.#.####-ba"],
-            [r"", r"c", r"ccba###\\13q4ujs", r"bc\+'**'", r"###.#.####-ba"],
-            [r"abcabccba###", r"\13q4ujsabbc", r"+'**'ac###.#.####-ba"],
-            [r"abcabccba", r"\\13q4ujsabbc\+'**'ac", r".", r".", r"-ba"],
-            [r"", r"", r"c", r"", r"cc", r"", r"", r"", r"\13q4ujs", r"", r"",
-                r"c\+'**'", r"c", r"", r"", r"", r"", r"-", r"", r""],
-            [r"", r"cba###\\13q4ujs", r"\+'**'", r"###.#.####-ba"],
-            [r"abcabccba###" + 2 * self.bs,
+            ["", "", r"cba###\\13q4ujsabbc\+'**'ac###.#.####-ba"],
+            ["", "c", r"ccba###\\13q4ujs", r"bc\+'**'ac###.#.####-ba"],
+            ["", "c", r"ccba###\\13q4ujs", r"bc\+'**'", "###.#.####-ba"],
+            ["abcabccba###", r"\13q4ujsabbc", "+'**'ac###.#.####-ba"],
+            ["abcabccba", r"\\13q4ujsabbc\+'**'ac", ".", ".", "-ba"],
+            ["", "", "c", "", "cc", "", "", "", r"\13q4ujs", "", "",
+                r"c\+'**'", "c", "", "", "", "", "-", "", ""],
+            ["", r"cba###\\13q4ujs", r"\+'**'", "###.#.####-ba"],
+            ["abcabccba###" + 2 * self.bs,
                 r"3q4ujsabbc\+'**'ac###.#.####-ba"]]
 
         self.assertResultsEqual(
@@ -97,14 +97,14 @@ class UnescapedSplitTest(StringProcessingTestBase):
     def test_auto_trim(self):
         expected_results = [
             [],
-            [2 * self.bs, r"\\\\\;\\#", r"\\\'", r"\;\\\\", r"+ios"],
-            [r"1", r"2", r"3", r"4", r"5", r"6"],
-            [r"1", r"2", r"3", r"4", r"5", r"6", r"7"],
+            [2 * self.bs, r"\\\\\;\\#", r"\\\'", r"\;\\\\", "+ios"],
+            ["1", "2", "3", "4", "5", "6"],
+            ["1", "2", "3", "4", "5", "6", "7"],
             [],
-            [r"Hello world"],
+            ["Hello world"],
             [r"\;"],
             [2 * self.bs],
-            [r"abc", r"a", r"asc"]]
+            ["abc", "a", "asc"]]
 
         self.assertResultsEqual(
             unescaped_split,
@@ -124,7 +124,7 @@ class UnescapedSplitTest(StringProcessingTestBase):
 
         self.assertResultsEqual(
             unescaped_split,
-            {(r"'()", test_string, 0, False, False): result
+            {("'()", test_string, 0, False, False): result
              for test_string, result in zip(self.test_strings,
                                             expected_results)},
             list)

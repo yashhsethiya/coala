@@ -12,22 +12,22 @@ class UnescapeTest(StringProcessingTestBase):
     def test_basic(self):
         expected_results = [
             r"out1 'escaped-escape:        \ ' out2",
-            r"out1 'escaped-quote:         ' ' out2",
-            r"out1 'escaped-anything:      X ' out2",
+            "out1 'escaped-quote:         ' ' out2",
+            "out1 'escaped-anything:      X ' out2",
             r"out1 'two escaped escapes: \\ ' out2",
-            r"out1 'escaped-quote at end:   '' out2",
+            "out1 'escaped-quote at end:   '' out2",
             r"out1 'escaped-escape at end:  \' out2",
-            r"out1           'str1' out2 'str2' out2",
-            r"out1 '        'str1' out2 'str2' out2",
+            "out1           'str1' out2 'str2' out2",
+            "out1 '        'str1' out2 'str2' out2",
             r"out1 \'      'str1' out2 'str2' out2",
             r"out1 \        'str1' out2 'str2' out2",
             r"out1 \\      'str1' out2 'str2' out2",
             r"out1         \'str1' out2 'str2' out2",
             r"out1       \\'str1' out2 'str2' out2",
-            r"out1           'str1''str2''str3' out2",
-            r"",
-            r"out1 out2 out3",
-            r"",
+            "out1           'str1''str2''str3' out2",
+            "",
+            "out1 out2 out3",
+            "",
             self.bs]
 
         self.assertResultsEqual(
