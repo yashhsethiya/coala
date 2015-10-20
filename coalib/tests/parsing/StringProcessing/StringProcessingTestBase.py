@@ -2,11 +2,6 @@ import unittest
 
 
 class StringProcessingTestBase(unittest.TestCase):
-    # The backslash character. Needed since there are limitations when
-    # using backslashes at the end of raw-strings in front of the
-    # terminating " or '.
-    bs = "\\"
-
     # Basic test strings all StringProcessing functions should test.
     test_strings = [
         r"out1 'escaped-escape:        \\ ' out2",
@@ -25,8 +20,8 @@ class StringProcessingTestBase(unittest.TestCase):
         "out1           'str1''str2''str3' out2",
         "",
         "out1 out2 out3",
-        bs,
-        2 * bs]
+        "\\",
+        "\\\\"]
 
     # Test string for multi-pattern tests (since we want to variate the
     # pattern, not the test string).
@@ -36,7 +31,7 @@ class StringProcessingTestBase(unittest.TestCase):
     multi_patterns = ["abc",
                       "ab",
                       "ab|ac",
-                      2 * bs,
+                      "\\\\",
                       "#+",
                       "(a)|(b)|(#.)",
                       "(?:a(b)*c)+",

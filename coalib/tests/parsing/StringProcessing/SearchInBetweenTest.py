@@ -103,7 +103,7 @@ class SearchInBetweenTest(StringProcessingTestBase):
             [("ab", 0, "c", 2, "ab", 3)],
             [("ab", 0, "c", 2, "ab", 3),
              ("ab", 21, r"bc\+'**'", 23, "ac", 31)],
-            [(self.bs, 12, "", 13, self.bs, 13)],
+            [("\\", 12, "", 13, "\\", 13)],
             [("###", 9, r"\\13q4ujsabbc\+'**'ac", 12, "###", 33),
              ("#", 37, ".", 38, "####", 39)],
             [("a", 0, "", 1, "b", 1),
@@ -116,7 +116,7 @@ class SearchInBetweenTest(StringProcessingTestBase):
              ("#.", 37, "", 39, "##", 39),
              ("##", 41, "-", 43, "b", 44)],
             [("abcabc", 0, r"cba###\\13q4ujs", 6, "abbc", 21)],
-            [("1", 14, "3q4ujsabbc" + self.bs, 15, "+", 26)]]
+            [("1", 14, "3q4ujsabbc\\", 15, "+", 26)]]
 
         self.assertResultsEqual(
             search_in_between,
@@ -136,9 +136,9 @@ class SearchInBetweenTest(StringProcessingTestBase):
     def test_auto_trim(self):
         expected_results = [
             [],
-            [(";", 2, 5 * self.bs, 3, ";", 8),
+            [(";", 2, 5 * "\\", 3, ";", 8),
              (";", 12, r"\\\'", 13, ";", 17),
-             (";", 18, self.bs, 19, ";", 20),
+             (";", 18, "\\", 19, ";", 20),
              (";", 25, "+ios", 26, ";", 30)],
             [(";", 1, "2", 2, ";", 3),
              (";", 5, "4", 6, ";", 7),
@@ -197,8 +197,8 @@ class SearchInBetweenTest(StringProcessingTestBase):
              ("(", 41, "", 42, ")", 42),
              ("(", 44, "hello.", 45, ")", 51)],
             [("(", 0, "", 1, ")", 1),
-             ("(", 8, r"This\ is a word" + self.bs, 9, ")", 25),
-             ("(", 29, r"(in a\\\ word" + 5 * self.bs, 30, ")", 48)],
+             ("(", 8, r"This\ is a word" + "\\", 9, ")", 25),
+             ("(", 29, r"(in a\\\ word" + 5 * "\\", 30, ")", 48)],
             [("(", 5, r"\(\((((((\\\(((((((((((1", 6, ")", 30)],
             [("(", 7, "do (it ", 8, ")", 15),
              ("(", 45, "", 46, ")", 46),

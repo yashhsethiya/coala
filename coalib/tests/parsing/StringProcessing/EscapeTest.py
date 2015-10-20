@@ -27,8 +27,8 @@ class EscapeTest(StringProcessingTestBase):
             r"out1           \'str1\'\'str2\'\'str3\' out2",
             "",
             "out1 out2 out3",
-            self.bs,
-            2 * self.bs]
+            "\\",
+            "\\\\"]
 
         self.assertResultsEqual(
             escape,
@@ -56,8 +56,8 @@ class EscapeTest(StringProcessingTestBase):
             "out()1           '()str()1''()str2''()str()()3' out2",
             "",
             "out()1 out2 out()()3",
-            self.bs,
-            2 * self.bs]
+            "\\",
+            "\\\\"]
 
         self.assertResultsEqual(
             escape,
@@ -85,8 +85,8 @@ class EscapeTest(StringProcessingTestBase):
             "out1^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ 'str1''str2''str3'^ out2",
             "",
             "out1^ out2^ out3",
-            self.bs,
-            2 * self.bs]
+            "\\",
+            "\\\\"]
 
         self.assertResultsEqual(
             escape,
@@ -114,8 +114,8 @@ class EscapeTest(StringProcessingTestBase):
             r"\out1           'str1''\str2''str3' out2",
             "",
             r"\out1 out2 out3",
-            self.bs,
-            2 * self.bs]
+            "\\",
+            "\\\\"]
 
         self.assertResultsEqual(
             escape,
