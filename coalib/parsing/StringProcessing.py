@@ -165,18 +165,6 @@ def trim_empty_matches(iterator, groups=(0,)):
             yield elem
 
 
-def trim_empty(iterator):
-    """
-    A filter that removes empty objects that support len() inside the passed
-    iterator.
-
-    :param iterator: The iterator to be filtered.
-    """
-    for elem in iterator:
-        if len(elem) != 0:
-            yield elem
-
-
 def search_for(pattern, string, flags=0, max_match=0, use_regex=False):
     """
     Searches for a given pattern in a string.
