@@ -2,11 +2,12 @@ import sys
 import unittest
 
 sys.path.insert(0, ".")
-from coalib.tests.parsing.StringProcessingTest import StringProcessingTest
-from coalib.parsing.StringProcessing import unescaped_search_for
+from coalib.tests.parsing.StringProcessing.StringProcessingTestBase import (
+    StringProcessingTestBase)
+from coalib.parsing.StringProcessing import search_for
 
 
-class UnescapedSearchForTest(StringProcessingTest):
+class SearchForTest(StringProcessingTestBase):
     # Match either "out1" or "out2".
     test_basic_pattern = "out1|out2"
     # These are the expected results for the zero-group of the
@@ -41,130 +42,59 @@ class UnescapedSearchForTest(StringProcessingTest):
         """
         return [elem.group(0) for elem in it]
 
-    # Test the unescaped_search_for() function.
+    # Test the search_for() function.
     def test_basic(self):
         expected_results = self.test_basic_expected_results
 
         self.assertResultsEqual(
-            unescaped_search_for,
+            search_for,
             {(self.test_basic_pattern, test_string, 0, 0, True): result
              for test_string, result in zip(self.test_strings,
                                             expected_results)},
             self.list_zero_group)
 
-    # Test unescaped_search_for() with a simple pattern.
+    # Test search_for() with a simple pattern.
     def test_simple_pattern(self):
         expected_results = [
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            6 * [r"'"],
-            [],
-            [],
-            [],
-            []]
+            i * [r"'"] for i in
+                [2, 3, 2, 2, 3, 2, 4, 5, 5, 4, 4, 4, 4, 6, 0, 0, 0, 0]]
 
         self.assertResultsEqual(
-            unescaped_search_for,
+            search_for,
             {(r"'", test_string, 0, 0, use_regex): result
              for test_string, result in zip(self.test_strings,
                                             expected_results)
              for use_regex in [True, False]},
             self.list_zero_group)
 
-    # Test unescaped_search_for() with an empty pattern.
+    # Test search_for() with an empty pattern.
     def test_empty_pattern(self):
-        # Since an empty pattern can also be escaped, the result contains
-        # special cases. Especially we check the completely matched string (and
-        # not only the matched pattern itself) we need to place also the
-        # matched escape characters inside the result list consumed from the
-        # internal regex of unescaped_search_for().
         expected_results = [
-            38 * [r""],
-            38 * [r""],
-            38 * [r""],
-            37 * [r""],
-            38 * [r""],
-            38 * [r""],
-            39 * [r""],
-            38 * [r""],
-            37 * [r""],
-            38 * [r""],
-            37 * [r""],
-            38 * [r""],
-            37 * [r""],
-            39 * [r""],
-            [r""],
-            15 * [r""],
-            [r""],
-            2 * [r""]]
+            (len(elem) + 1) * [r""] for elem in self.test_strings]
 
         self.assertResultsEqual(
-            unescaped_search_for,
+            search_for,
             {(r"", test_string, 0, 0, use_regex): result
              for test_string, result in zip(self.test_strings,
                                             expected_results)
              for use_regex in [True, False]},
             self.list_zero_group)
 
-    # Test unescaped_search_for() for its max_match parameter.
+    # Test search_for() for its max_match parameter.
     def test_max_match(self):
         search_pattern = self.test_basic_pattern
         expected_master_results = self.test_basic_expected_results
 
         self.assertResultsEqual(
-            unescaped_search_for,
+            search_for,
             {(search_pattern, test_string, 0, max_match, True): result
-             for max_match in [1, 2, 3, 4, 5, 6, 987, 1122334455]
+             for max_match in [1, 2, 3, 4, 5, 6, 987, 100928321]
              for test_string, result in zip(
                  self.test_strings,
                  [elem[0 : max_match] for elem in expected_master_results])},
             self.list_zero_group)
 
-    # Test unescaped_search_for() for its max_match parameter with matches
-    # that are also escaped.
-    def test_max_match_escaping_flaw(self):
-        expected_master_results = [
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            2 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            4 * [r"'"],
-            6 * [r"'"],
-            [],
-            [],
-            [],
-            []]
-
-        self.assertResultsEqual(
-            unescaped_search_for,
-            {(r"'", test_string, 0, max_match, use_regex): result
-             for max_match in [1, 2, 3, 4, 5, 6, 100]
-             for test_string, result in zip(
-                 self.test_strings,
-                 [elem[0 : max_match] for elem in expected_master_results])
-             for use_regex in [True, False]},
-            self.list_zero_group)
-
-    # Test unescaped_search_for() with regexes disabled.
+    # Test search_for() with regexes disabled.
     def test_disabled_regex(self):
         search_pattern = r"\'"
         expected_results = [
@@ -173,14 +103,14 @@ class UnescapedSearchForTest(StringProcessingTest):
             [],
             [],
             [search_pattern],
-            [],
+            [search_pattern],
             [],
             [search_pattern],
             [search_pattern],
             [],
             [],
-            [],
-            [],
+            [search_pattern],
+            [search_pattern],
             [],
             [],
             [],
@@ -188,7 +118,7 @@ class UnescapedSearchForTest(StringProcessingTest):
             []]
 
         self.assertResultsEqual(
-            unescaped_search_for,
+            search_for,
             {(search_pattern, test_string, 0, 0, False): result
              for test_string, result in zip(self.test_strings,
                                             expected_results)},
@@ -197,4 +127,3 @@ class UnescapedSearchForTest(StringProcessingTest):
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
-

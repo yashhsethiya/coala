@@ -2,13 +2,14 @@ import sys
 import unittest
 
 sys.path.insert(0, ".")
-from coalib.tests.parsing.StringProcessingTest import StringProcessingTest
+from coalib.tests.parsing.StringProcessing.StringProcessingTestBase import (
+    StringProcessingTestBase)
 from coalib.parsing.StringProcessing import (InBetweenMatch,
                                              unescaped_search_in_between)
 
 
-class UnescapedSearchInBetweenTest(StringProcessingTest):
-    bs = StringProcessingTest.bs
+class UnescapedSearchInBetweenTest(StringProcessingTestBase):
+    bs = StringProcessingTestBase.bs
 
     test_basic_pattern = "'"
     test_basic_expected_results = [
