@@ -15,17 +15,26 @@ from coalib.parsing.StringProcessing import search_in_between
 
 
 def _extract_documentation(content, docstyle_definition):
-    match_iterators = tuple(re.finditer(re.escape(marker_set[0]))
-                            for marker_set in docstyle_definition.markers)
-    start_marker_matches = [next(it) for it in match_iterators]
-
-    # TODO Document that we assume to get a list of splitted lines if we don't
-    #      provide a string.
+    # TODO Document that we assume to get an iterable of splitted lines if we
+    #      don't provide a string.
     if isinstance(content, str):
         content_len = len(content)
         content = content.splitlines()
     else:
+        content = list(content)
         content_len = sum(len(line) for line in content)
+
+    # TODO: Use compiled regexes because we need to span over splitted lines.
+    #       The counting algorithms get complicated...
+    # TODO: Maybe don't use the regex module at all, plain str.find should do
+    #       the job, since we need definitely manual search-positioning
+    #       control. This makes index handling more complicated, but using
+    #       permanently new iterators for each line is even worse I believe.
+    # TODO: Use direct list access instead of "retupelizing" stuff for indices
+    #       everytime. Rechanging lists is quicker. BTW: lists support <, > ...
+    match_iterators = tuple(re.finditer(re.escape(marker_set[0]))
+                            for marker_set in docstyle_definition.markers)
+    start_marker_matches = [next(it) for it in match_iterators]
 
     # As long as a match was found for every marker, continue extracting.
     # TODO: Replace that with a counter that counts/decrements "None" matches.
@@ -34,18 +43,16 @@ def _extract_documentation(content, docstyle_definition):
             enumerate(values),
             key=lambda x: content_len if x[1] is None else x[1].start)
 
-
+        # TODO 3 states/phases finite-state-machine:
+        # 1. Search for each start marker and take the lowest one. (cache
+        #    already found indexes)
+        # 2. Check each-line markering. if mismatch, goto 3.
+        # 3. Check for end marker. If mismatch goto 1 and dismiss current
+        #    match.
 
         yield ...
 
         start_marker_matches[i] = next(match_iterators[i])
-
-
-    # 3 Phase:
-    # 1. Search for each start marker and take the lowest one. (cache already
-    #    found indexes)
-    # 2. Check each-line markering. if mismatch, goto 3.
-    # 3. Check for end marker. If mismatch goto 1 and dismiss current match.
 
 
 def _extract_documentation_standard(content,
