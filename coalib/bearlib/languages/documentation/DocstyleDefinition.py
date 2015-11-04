@@ -2,73 +2,19 @@ import os.path
 
 from coalib.misc.Compatability import FileNotFoundError
 from coalib.misc.Decorators import generate_eq, generate_repr
-from coalib.misc.Enum import enum
 from coalib.parsing.ConfParser import ConfParser
 
 
-"""
-Possible values for the type/format of the documentation.
-
-- standard:
-  The standard doctype is identified by a start, stop and each-line marker. The
-  each-line marker specifies the prefix of following lines after the start
-  marker.
-
-  For example
-
-  ```
-  /**
-   * documentation
-   */
-  ```
-
-  is a standard doctype with the markers `/**`, `*`, `*/`.
-
-- simple:
-  Nearly like standard doctype, but there's no each-line marker, just start and
-  stop.
-
-  For example
-
-  ```
-  '''
-  documentation
-  '''
-  ```
-
-  is a simple doctype with the markers `'''`, `'''`.
-
-- continuous:
-  The continuous doctype needs a start and each-line marker. Documentation
-  starts with the start marker (obviously) and continues as long as each
-  following line has the same prefix like the each-line marker.
-
-  For example
-
-  ```
-  ## documentation
-  #
-  #  more detailed documentation
-  ```
-
-  is a continuous doctype with the markers `##`, `#`.
-"""
-DOCTYPES = enum("standard", "simple", "continuous")
-
-
-@generate_repr("language",
-               "docstyle",
-               ("doctype", DOCTYPES.reverse.get),
-               "markers")
-@generate_eq("language", "docstyle", "doctype", "markers")
+@generate_repr()
+@generate_eq("language", "docstyle", "markers")
 class DocstyleDefinition:
     """
-    The DocstyleDefinition class holds values that identify a certain type
-    of documentation comment (for which language, documentation style/tool
-    used, type of documentation and delimiters/markers).
+    The DocstyleDefinition class holds values that identify a certain type of
+    documentation comment (for which language, documentation style/tool used
+    etc.).
     """
 
-    def __init__(self, language, docstyle, doctype, markers):
+    def __init__(self, language, docstyle, markers):
         """
         Instantiates a new DocstyleDefinition.
 
@@ -81,16 +27,20 @@ class DocstyleDefinition:
                          For example `"default"` or `"doxygen"`.
                          The given string is automatically lowered, so passing
                          i.e. "default" or "DEFAULT" makes no difference.
-        :param doctype:  The type/format of the documentation. Needs to be a
-                         value of the enumeration `DOCTYPES`.
-        :param markers:  A tuple of marker/delimiter strings that identify the
-                         documentation comment. See `DOCTYPES` for more
-                         information about doctype markers.
+        :param markers:  An iterable of marker/delimiter string iterables that
+                         identify a documentation comment. See `markers`
+                         property for more details on markers.
         """
         self._language = language.lower()
         self._docstyle = docstyle.lower()
-        self._doctype = doctype
-        self._markers = markers
+        self._markers = tuple(tuple(marker_set) for marker_set in markers)
+
+        # Check marker set dimensions.
+        for marker_set in self._markers:
+            length = len(marker_set)
+            if length != 3:
+                raise ValueError("Length of a given marker set was not 3 (was "
+                                 "actually {}).".format(length))
 
     @property
     def language(self):
@@ -113,87 +63,85 @@ class DocstyleDefinition:
         return self._docstyle
 
     @property
-    def doctype(self):
-        """
-        The type/format of the documentation.
-
-        :return: A value from `DOCTYPES` enumeration.
-        """
-        return self._doctype
-
-    @property
     def markers(self):
         """
-        The string markers that identify a documentation comment.
+        A tuple of marker sets that identify a documentation comment.
 
-        See `DOCTYPES` for more information about doctype markers.
+        Marker sets consist of 3 entries where the first is the start-marker,
+        the second one the each-line marker and the last one the end-marker. For
+        example a marker tuple with a single marker set `(("/**", "*", "*/"),)`
+        would match following documentation comment:
 
-        :return: A tuple of marker/delimiter strings that identify the
+        ```
+        /**
+         * This is documentation.
+         */
+        ```
+
+        It's also possible to supply an empty each-line marker
+        (`("/**", "", "*/")`):
+
+        ```
+        /**
+         This is more documentation.
+         */
+        ```
+
+        Markers are matched "greedy", that means it will match as many each-line
+        markers as possible. I.e. for `("///", "///", "///")`):
+
+        ```
+        /// Brief documentation.
+        ///
+        /// Detailed documentation.
+        ```
+
+        :return: A tuple of marker/delimiter string tuples that identify a
                  documentation comment.
         """
         return self._markers
 
-    @staticmethod
-    def _get_prefixed_settings(settings, prefix):
-        """
-        Retrieves all settings with their name matching the given prefix.
-
-        :param settings: The settings dictionary to search in.
-        :param prefix:   The prefix all returned settings shall have.
-        :return:         A dict with setting-names as keys and setting-values
-                         as values.
-        """
-        return {setting : settings[setting]
-                for setting in filter(lambda x: x.startswith(prefix),
-                                      settings)}
-
     @classmethod
     def load(cls, language, docstyle):
         """
-        Yields all DocstyleDefinition's defined for the given language and
+        Returns a `DocstyleDefinition` defined for the given language and
         docstyle from the coala docstyle definition files.
 
-        The marker settings are loaded from the according coalang-files and are
-        prefixed like this:
-
-        `doc-marker-<DOCTYPE>`
-
-        where <DOCTYPE> is a value of the enumeration `DOCTYPES`.
+        The marker settings are loaded from the according coalang-files. Each
+        setting inside them are considered a marker setting.
 
         :param language:           The programming language. For example
                                    `"CPP"` for C++ or `"PYTHON3"` for Python 3.
+                                   The given string is automatically lowered, so
+                                   passing i.e. "CPP" or "cpp" makes no
+                                   difference.
         :param docstyle:           The documentation style/tool used. For
                                    example `"default"` or `"doxygen"`.
+                                   The given string is automatically lowered, so
+                                   passing i.e. "default" or "DEFAULT" makes no
+                                   difference.
         :raises FileNotFoundError: Raised when the given docstyle was not
                                    found. This is a compatability exception
                                    from `coalib.misc.Compatability` module.
         :raises KeyError:          Raised when the given language is not
                                    defined for given docstyle.
-        :return:                   An iterator yielding `DocstyleDefinition`s
-                                   for given language and docstyle.
+        :return:                   The `DocstyleDefinition` for giving language
+                                   and docstyle.
         """
 
         try:
             docstyle_settings = ConfParser().parse(os.path.dirname(__file__) +
-                                                   "/" + docstyle.lower() +
-                                                   ".coalang")
+                                                   "/" + docstyle + ".coalang")
         except FileNotFoundError as ex:
             raise type(ex)("Docstyle definition " + repr(docstyle) +
                            " not found.")
 
         try:
-            docstyle_settings = docstyle_settings[language.lower()]
+            docstyle_settings = docstyle_settings[language]
         except KeyError:
             raise KeyError("Language {} is not defined for docstyle {}."
                            .format(repr(language), repr(docstyle)))
 
-        for doctype in DOCTYPES.str_dict:
-            settings = DocstyleDefinition._get_prefixed_settings(
-                docstyle_settings,
-                "doc-marker-" + doctype)
+        marker_sets = (value for value in docstyle_settings.values())
 
-            for marker_setting in settings.values():
-                yield cls(language,
-                          docstyle,
-                          DOCTYPES.str_dict[doctype],
-                          tuple(marker_setting))
+        return cls(language, docstyle, marker_sets)

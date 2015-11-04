@@ -1,9 +1,9 @@
 from itertools import chain
-from operator import attrgetter
+from operator import attrgetter, itemgetter
+import re
 
 from coalib.bearlib.languages.documentation.DocstyleDefinition import (
     DocstyleDefinition,
-    DOCTYPES)
 from coalib.bearlib.languages.documentation.DocumentationComment import (
     DocumentationComment)
 from coalib.parsing.StringProcessing import search_in_between
@@ -12,6 +12,40 @@ from coalib.parsing.StringProcessing import search_in_between
 #TODO - Implement Match also for `split` and `search_for`? File an issue
 #TODO - document currently existing docstyles from coala side?
 #TODO - Add ''' ''' as markers for python 2/3 inside doc-definition files.
+
+
+def _extract_documentation(content, docstyle_definition):
+    match_iterators = tuple(re.finditer(re.escape(marker_set[0]))
+                            for marker_set in docstyle_definition.markers)
+    start_marker_matches = [next(it) for it in match_iterators]
+
+    # TODO Document that we assume to get a list of splitted lines if we don't
+    #      provide a string.
+    if isinstance(content, str):
+        content_len = len(content)
+        content = content.splitlines()
+    else:
+        content_len = sum(len(line) for line in content)
+
+    # As long as a match was found for every marker, continue extracting.
+    # TODO: Replace that with a counter that counts/decrements "None" matches.
+    while any(start_marker_matches):
+        i, match = min(
+            enumerate(values),
+            key=lambda x: content_len if x[1] is None else x[1].start)
+
+
+
+        yield ...
+
+        start_marker_matches[i] = next(match_iterators[i])
+
+
+    # 3 Phase:
+    # 1. Search for each start marker and take the lowest one. (cache already
+    #    found indexes)
+    # 2. Check each-line markering. if mismatch, goto 3.
+    # 3. Check for end marker. If mismatch goto 1 and dismiss current match.
 
 
 def _extract_documentation_standard(content,
@@ -128,7 +162,6 @@ def extract_documentation_with_docstyle(content, docstyle_definition):
     :return:                    An iterator returning each documentation text
                                 found in the content.
     """
-    markers = docstyle_definition.markers
 
     try:
         results = _extract[docstyle_definition.doctype](content, *markers)

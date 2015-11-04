@@ -7,48 +7,48 @@
 
 
 [C]
-doc-marker-standard1 = /**, *, */
-doc-marker-standard2 = /*!, *, */
-doc-marker-simple1 = /**, */
-doc-marker-simple2 = /*!, */
+doc-marker1 = /**, *, */
+doc-marker2 = /**, , */
+doc-marker3 = /*!, *, */
+doc-marker4 = /*!, , */
 
 [CPP]
-doc-marker-standard1 = /**, *, */
-doc-marker-standard2 = /*!, *, */
-doc-marker-simple1 = /**, */
-doc-marker-simple2 = /*!, */
-doc-marker-continuous1 = ///, ///
-doc-marker-continuous2 = //!, //!
+doc-marker1 = /**, *, */
+doc-marker2 = /**, , */
+doc-marker3 = /*!, *, */
+doc-marker4 = /*!, , */
+doc-marker5 = ///, , ///
+doc-marker6 = //!, , //!
 
 [CS]
-doc-marker-standard1 = /**, *, */
-doc-marker-standard2 = /*!, *, */
-doc-marker-simple1 = /**, */
-doc-marker-simple2 = /*!, */
-doc-marker-continuous1 = ///, ///
-doc-marker-continuous2 = //!, //!
+doc-marker1 = /**, *, */
+doc-marker2 = /**, , */
+doc-marker3 = /*!, *, */
+doc-marker4 = /*!, , */
+doc-marker5 = ///, , ///
+doc-marker6 = //!, , //!
 
 [FORTRAN]
-doc-marker-continuous = !>, !!
+doc-marker = !>, , !!
 
 [JAVA]
-doc-marker-standard1 = /**, *, */
-doc-marker-standard2 = /*!, *, */
-doc-marker-simple1 = /**, */
-doc-marker-simple2 = /*!, */
-doc-marker-continuous1 = ///, ///
-doc-marker-continuous2 = //!, //!
+doc-marker1 = /**, *, */
+doc-marker2 = /**, , */
+doc-marker3 = /*!, *, */
+doc-marker4 = /*!, , */
+doc-marker5 = ///, , ///
+doc-marker6 = //!, , //!
 
 [PYTHON]
-doc-marker-simple = """, """
-doc-marker-continuous = \#\#, \#
+doc-marker1 = """, , """
+doc-marker2 = \#\#, , \#
 
 [PYTHON3]
-doc-marker-simple = """, """
-doc-marker-continuous = \#\#, \#
+doc-marker1 = """, , """
+doc-marker2 = \#\#, , \#
 
 [TCL]
-doc-marker-continuous = ##, #
+doc-marker = ##, , #
 
 [VHDL]
-doc-marker-continuous = --!, --!
+doc-marker = --!, , --!
