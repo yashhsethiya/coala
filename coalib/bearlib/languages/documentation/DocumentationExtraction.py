@@ -26,19 +26,17 @@ def _extract_documentation(content, docstyle_definition):
 
     # TODO: Use compiled regexes because we need to span over splitted lines.
     #       The counting algorithms get complicated...
-    # TODO: Maybe don't use the regex module at all, plain str.find should do
-    #       the job, since we need definitely manual search-positioning
-    #       control. This makes index handling more complicated, but using
-    #       permanently new iterators for each line is even worse I believe.
     # TODO: Use direct list access instead of "retupelizing" stuff for indices
     #       everytime. Rechanging lists is quicker. BTW: lists support <, > ...
-    match_iterators = tuple(re.finditer(re.escape(marker_set[0]))
-                            for marker_set in docstyle_definition.markers)
-    start_marker_matches = [next(it) for it in match_iterators]
+    # TODO: Using regexes for searching multiple sequences is more efficient
+    #       than plain find. (~50% faster)
+    begin_regex = re.compile("|".join(
+        re.escape(marker_set[0]) for marker_set in docstyle_definition.markers))
 
     # As long as a match was found for every marker, continue extracting.
     # TODO: Replace that with a counter that counts/decrements "None" matches.
-    while any(start_marker_matches):
+    begin_match = begin_regex.search()
+    while begin_sequence_regex:
         i, match = min(
             enumerate(values),
             key=lambda x: content_len if x[1] is None else x[1].start)
