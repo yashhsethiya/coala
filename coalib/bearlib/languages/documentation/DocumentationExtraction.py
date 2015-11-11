@@ -15,8 +15,9 @@ from coalib.parsing.StringProcessing import search_in_between
 
 
 def _extract_documentation(content, docstyle_definition):
-    # TODO Document that we assume to get an iterable of splitted lines if we
-    #      don't provide a string.
+    # TODO Document that we assume to get an iterable of splitted lines (with
+    #      ending whitespaces like \n!!!)if we don't provide a string.
+    # TODO Refactor and delete unnecessary statements/variables.
     if isinstance(content, str):
         content_len = len(content)
         content = content.splitlines()
@@ -30,27 +31,73 @@ def _extract_documentation(content, docstyle_definition):
     #       everytime. Rechanging lists is quicker. BTW: lists support <, > ...
     # TODO: Using regexes for searching multiple sequences is more efficient
     #       than plain find. (~50% faster)
+
+    # TODO: begin_sequence_dict comment: More information why we need it?
+    #       (would go for it).
+
+    # Prepare marker-tuple dict that maps a begin pattern to the corresponding
+    # marker_set(s).
+    begin_sequence_dict = {}
+    for marker_set in docstyle_definition.markers:
+        if marker_set[0] not in begin_sequence_dict:
+            begin_sequence_dict[marker_set[0]] = [marker_set[0]]
+        else:
+            begin_sequence_dict[marker_set[0]].append(marker_set[0])
+
+    # Using regexes to perform a variable match is faster than finding each
+    # substring with `str.find()` choosing the lowest match.
     begin_regex = re.compile("|".join(
         re.escape(marker_set[0]) for marker_set in docstyle_definition.markers))
 
-    # As long as a match was found for every marker, continue extracting.
-    # TODO: Replace that with a counter that counts/decrements "None" matches.
-    begin_match = begin_regex.search()
-    while begin_sequence_regex:
-        i, match = min(
-            enumerate(values),
-            key=lambda x: content_len if x[1] is None else x[1].start)
+    line = 0
+    pos = 0
+    line_pos = 0
+    while line < len(content):
+        # TODO Handle start search position because doc-extraction may stop
+        #      while something is still coming.
+        begin_match = begin_regex.search(content[line])
+        while begin_match:
+            matched_marker_sets = begin_sequence_dict[begin_match.group()]
 
-        # TODO 3 states/phases finite-state-machine:
-        # 1. Search for each start marker and take the lowest one. (cache
-        #    already found indexes)
-        # 2. Check each-line markering. if mismatch, goto 3.
-        # 3. Check for end marker. If mismatch goto 1 and dismiss current
-        #    match.
+            # TODO: Inline expression `matched_marker_sets`?.
+            for marker_set in matched_marker_sets:
+                end_marker_pos = content[line].find(marker_set[2],
+                                                    begin_match.end())
 
-        yield ...
+                if end_marker_pos == -1:
+                    docstring = content[line][begin_match.end():]
 
-        start_marker_matches[i] = next(match_iterators[i])
+                    line2 = line + 1
+                    end_marker_pos = content[line2].find(marker_set[2])
+                    while end_marker_pos == -1:
+                        # TODO: Implement missing each-line marker check
+                        #       (`continue` then).
+                        # TODO: When no each-line marker specified, extract with
+                        #       alignment from `begin_match`.
+
+                        docstring += content[line2]
+                        pos += len(content[line2])
+
+                        line2 += 1
+                        end_marker_pos = content[line2].find(marker_set[2])
+
+                    docstring += content[line2][:end_marker_pos]
+                    line = line2
+                    line_pos = end_marker_pos
+                else:
+                    docstring = content[line2][begin_match.end():end_marker_pos]
+                    line_pos = end_marker_pos
+                    # TODO DAMN::: Conside also the length of the end-sequence
+                    #              String!!!!!!
+
+                break
+
+        line += 1
+        pos += len(content[line]) - line_pos
+        line_pos = 0
+
+
+
 
 
 def _extract_documentation_standard(content,
