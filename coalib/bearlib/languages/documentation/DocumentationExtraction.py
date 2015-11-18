@@ -53,13 +53,11 @@ def _extract_documentation(content, docstyle_definition):
     pos = 0
     line_pos = 0
     while line < len(content):
-        # TODO Handle start search position because doc-extraction may stop
-        #      while something is still coming.
-        begin_match = begin_regex.search(content[line])
-        while begin_match:
+        begin_match = begin_regex.search(content[line], line_pos)
+        if begin_match:
             matched_marker_sets = begin_sequence_dict[begin_match.group()]
 
-            # TODO: Inline expression `matched_marker_sets`?.
+            # TODO: Inline expression `matched_marker_sets`?. And add comment?
             for marker_set in matched_marker_sets:
                 end_marker_pos = content[line].find(marker_set[2],
                                                     begin_match.end())
@@ -77,24 +75,29 @@ def _extract_documentation(content, docstyle_definition):
 
                         docstring += content[line2]
                         pos += len(content[line2])
-
                         line2 += 1
-                        end_marker_pos = content[line2].find(marker_set[2])
+
+                        try:
+                            end_marker_pos = content[line2].find(marker_set[2])
+                        except IndexError:
+                            continue
 
                     docstring += content[line2][:end_marker_pos]
                     line = line2
-                    line_pos = end_marker_pos
                 else:
                     docstring = content[line2][begin_match.end():end_marker_pos]
-                    line_pos = end_marker_pos
-                    # TODO DAMN::: Conside also the length of the end-sequence
-                    #              String!!!!!!
 
+                # TODO: Wrap results inside DocumentationComment.
+                # YIELD THEM HERE OR BELOW line_pos!!!
+
+                line_pos = end_marker_pos + len(marker_set[2])
                 break
+        else:
+            line += 1
+            line_pos = 0
 
-        line += 1
-        pos += len(content[line]) - line_pos
-        line_pos = 0
+        # TODO: Implement TextRange
+
 
 
 
