@@ -15,10 +15,9 @@ class DocumentationComment:
 
         :param documentation: The documentation text.
         :param docstyle:      The DocstyleDefinition.
-        :param marker:        The specific set of marker strings that identified
-                              this documentation comment.
-        :param range:         The position range as a pair `(start, stop)`
-                              where the documentation was found.
+        :param marker:        The specific set of marker strings that
+                              identified this documentation comment.
+        :param range:         The position range of type TextRange.
         """
         self.documentation = documentation
         self.docstyle = docstyle

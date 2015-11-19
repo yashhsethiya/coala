@@ -7,6 +7,7 @@ from coalib.bearlib.languages.documentation.DocstyleDefinition import (
 from coalib.bearlib.languages.documentation.DocumentationComment import (
     DocumentationComment)
 from coalib.parsing.StringProcessing import search_in_between
+from coalib.results.TextRange import TextRange
 
 
 #TODO - Implement Match also for `split` and `search_for`? File an issue
@@ -25,18 +26,11 @@ def _extract_documentation(content, docstyle_definition):
         content = list(content)
         content_len = sum(len(line) for line in content)
 
-    # TODO: Use compiled regexes because we need to span over splitted lines.
-    #       The counting algorithms get complicated...
-    # TODO: Use direct list access instead of "retupelizing" stuff for indices
-    #       everytime. Rechanging lists is quicker. BTW: lists support <, > ...
-    # TODO: Using regexes for searching multiple sequences is more efficient
-    #       than plain find. (~50% faster)
-
-    # TODO: begin_sequence_dict comment: More information why we need it?
-    #       (would go for it).
-
     # Prepare marker-tuple dict that maps a begin pattern to the corresponding
-    # marker_set(s).
+    # marker_set(s). This makes it faster to retrieve a marker-set from a
+    # begin sequence we initially want to search for in source code. Then
+    # the possible found documentation match is processed further with the
+    # rest markers.
     begin_sequence_dict = {}
     for marker_set in docstyle_definition.markers:
         if marker_set[0] not in begin_sequence_dict:
@@ -47,7 +41,8 @@ def _extract_documentation(content, docstyle_definition):
     # Using regexes to perform a variable match is faster than finding each
     # substring with `str.find()` choosing the lowest match.
     begin_regex = re.compile("|".join(
-        re.escape(marker_set[0]) for marker_set in docstyle_definition.markers))
+        re.escape(marker_set[0])
+        for marker_set in docstyle_definition.markers))
 
     line = 0
     pos = 0
@@ -55,10 +50,11 @@ def _extract_documentation(content, docstyle_definition):
     while line < len(content):
         begin_match = begin_regex.search(content[line], line_pos)
         if begin_match:
-            matched_marker_sets = begin_sequence_dict[begin_match.group()]
+            begin_match_line = line
 
-            # TODO: Inline expression `matched_marker_sets`?. And add comment?
-            for marker_set in matched_marker_sets:
+            # begin_sequence_dict[begin_match.group()] returns the marker set
+            # the begin sequence from before matched.
+            for marker_set in begin_sequence_dict[begin_match.group()]:
                 end_marker_pos = content[line].find(marker_set[2],
                                                     begin_match.end())
 
@@ -77,6 +73,9 @@ def _extract_documentation(content, docstyle_definition):
                         pos += len(content[line2])
                         line2 += 1
 
+                        # TODO: Expand try block more outside for performance
+                        #       reasons. Because setting permanently up an
+                        #       exception stack costs time...
                         try:
                             end_marker_pos = content[line2].find(marker_set[2])
                         except IndexError:
@@ -85,122 +84,29 @@ def _extract_documentation(content, docstyle_definition):
                     docstring += content[line2][:end_marker_pos]
                     line = line2
                 else:
-                    docstring = content[line2][begin_match.end():end_marker_pos]
-
-                # TODO: Wrap results inside DocumentationComment.
-                # YIELD THEM HERE OR BELOW line_pos!!!
+                    docstring = content[line][begin_match.end():end_marker_pos]
 
                 line_pos = end_marker_pos + len(marker_set[2])
+
+                rng = TextRange.from_values(begin_match_line,
+                                            begin_match.begin(),
+                                            line,
+                                            line_pos)
+
+                yield DocumentationComment(docstring,
+                                           docstyle,
+                                           marker_set,
+                                           rng)
                 break
         else:
             line += 1
             line_pos = 0
 
-        # TODO: Implement TextRange
 
+# TODO TextPosition + TextRange tests.
 
-
-
-
-
-def _extract_documentation_standard(content,
-                                    marker_start,
-                                    marker_eachline,
-                                    marker_stop):
-    """
-    Extract documentation of doctype 'standard'.
-
-    :param content:         The source-code-string where to extract
-                            documentation from.
-    :param marker_start:    The start marker.
-    :param marker_eachline: The each-line marker.
-    :param marker_stop:     The stop marker.
-    :return:                An iterator yielding a tuple where the first entry
-                            is a range pair (start, end) describing the range
-                            where the documentation was found and the second
-                            one the actual documentation string.
-    """
-
-    for match in search_in_between(marker_start, marker_stop, content):
-        it = iter(str(match.inside).splitlines(keepends=True))
-        docstring = next(it)
-        docstring += "".join(line.lstrip(" \t").replace(marker_eachline, "", 1)
-                             for line in it)
-
-        yield ((match.begin.position, match.end.end_position), docstring)
-
-
-def _extract_documentation_simple(content, marker_start, marker_stop):
-    """
-    Extract documentation of doctype 'simple'.
-
-    :param content:      The source-code-string where to extract documentation
-                         from.
-    :param marker_start: The start marker.
-    :param marker_stop:  The stop marker.
-    :return:             An iterator yielding a tuple where the first entry is
-                         a range pair (start, end) describing the range where
-                         the documentation was found and the second one the
-                         actual documentation string.
-    """
-    for match in search_in_between(marker_start, marker_stop, content):
-        it = iter(str(match.inside).splitlines(keepends=True))
-        docstring = next(it)
-        docstring += "".join(line.lstrip(" \t") for line in it)
-
-        yield ((match.begin.position, match.end.end_position), docstring)
-
-
-def _extract_documentation_continuous(content, marker_start, marker_ongoing):
-    """
-    Extract documentation of doctype 'continuous'.
-
-    :param content:        The source-code-string where to extract
-                           documentation from.
-    :param marker_start:   The start marker.
-    :param marker_ongoing: The ongoing marker.
-    :return:               An iterator yielding a tuple where the first entry
-                           is a range pair (start, end) describing the range
-                           where the documentation was found and the second one
-                           the actual documentation string.
-    """
-    pos = content.find(marker_start)
-    while pos != -1:
-        it = iter(content[pos + len(marker_start):]
-                  .splitlines(keepends=True))
-
-        found_pos = pos
-        docstring = next(it)
-        pos += len(marker_start) + len(docstring)
-
-        for line in it:
-            lstripped_line = line.lstrip(" \t")
-            # Search until the ongoing-marker runs out.
-            if lstripped_line.startswith(marker_ongoing):
-                docstring += lstripped_line[len(marker_ongoing):]
-            else:
-                break
-
-            pos += len(line)
-
-        yield ((found_pos, pos), docstring)
-
-        pos = content.find(marker_start, pos)
-
-
-"""
-Contains all registered documentation extraction functions.
-
-The functions must at least accept one parameter, the source-code-content
-where to extract documentation from. They have to yield tuples where the first
-entry is the `(start, stop)`-position tuple and the second one the actual
-documentation string.
-"""
-_extract = {DOCTYPES.standard : _extract_documentation_standard,
-            DOCTYPES.simple : _extract_documentation_simple,
-            DOCTYPES.continuous : _extract_documentation_continuous}
-
-
+# TODO Adapt algorithm to above. Or just replace the name:
+#      (_extract_documentation -> extract_documentation_with_docstyle)...
 def extract_documentation_with_docstyle(content, docstyle_definition):
     """
     Extracts all documentation texts inside the given source-code-string.
