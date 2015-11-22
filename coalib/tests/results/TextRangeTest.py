@@ -11,6 +11,9 @@ class TextRangeTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             TextRange(TextPosition(3, 4), TextPosition(2, 8))
 
+        with self.assertRaises(ValueError):
+            TextRange(TextPosition(0, 10), TextPosition(0, 7))
+
         with self.assertRaises(TypeError):
             TextRange(None, TextPosition(20, 80))
 
@@ -37,15 +40,20 @@ class TextRangeTest(unittest.TestCase):
 
         uut = TextRange.from_values(1, 0, 7, 3)
         self.assertEqual(uut.start, TextPosition(1, 0))
-        self.assertEqual(uut.start, TextPosition(7, 3))
+        self.assertEqual(uut.end, TextPosition(7, 3))
 
         uut = TextRange.from_values(1, 0, None, 88)
         self.assertEqual(uut.start, TextPosition(1, 0))
-        self.assertEqual(uut.start, TextPosition(1, 0))
+        self.assertEqual(uut.end, TextPosition(1, 0))
 
         uut = TextRange.from_values(1, 0, 7, None)
         self.assertEqual(uut.start, TextPosition(1, 0))
-        self.assertEqual(uut.start, TextPosition(7, None))
+        self.assertEqual(uut.end, TextPosition(7, None))
+
+        # Test defaults.
+        uut = TextRange.from_values()
+        self.assertEqual(uut.start, TextPosition(None, None))
+        self.assertEqual(uut.end, TextPosition(None, None))
 
 
 if __name__ == '__main__':

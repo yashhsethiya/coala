@@ -48,7 +48,7 @@ class TextRange:
         :return:             A TextRange.
         """
         start = TextPosition(start_line, start_column)
-        if not end_line:
+        if end_line is None:
             end = None
         else:
             end = TextPosition(end_line, end_column)
