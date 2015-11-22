@@ -15,10 +15,19 @@ from coalib.results.TextRange import TextRange
 #TODO - Add ''' ''' as markers for python 2/3 inside doc-definition files.
 
 
-def _extract_documentation(content, docstyle_definition):
-    # TODO Document that we assume to get an iterable of splitted lines (with
-    #      ending whitespaces like \n!!!)if we don't provide a string.
-    # TODO Refactor and delete unnecessary statements/variables.
+def extract_documentation_with_docstyle(content, docstyle_definition):
+    """
+    Extracts all documentation texts inside the given source-code-string.
+
+    :param content:             The source-code-string where to extract
+                                documentation from or an iterable with strings
+                                where each string is a single line (including
+                                ending whitespaces like `\\n`).
+    :param docstyle_definition: The DocstyleDefinition that identifies the
+                                documentation comments.
+    :return:                    An iterator returning each documentation text
+                                found in the content.
+    """
     if isinstance(content, str):
         content_len = len(content)
         content = content.splitlines()
@@ -45,7 +54,6 @@ def _extract_documentation(content, docstyle_definition):
         for marker_set in docstyle_definition.markers))
 
     line = 0
-    pos = 0
     line_pos = 0
     while line < len(content):
         begin_match = begin_regex.search(content[line], line_pos)
@@ -64,22 +72,40 @@ def _extract_documentation(content, docstyle_definition):
                     line2 = line + 1
                     end_marker_pos = content[line2].find(marker_set[2])
                     while end_marker_pos == -1:
-                        # TODO: Implement missing each-line marker check
-                        #       (`continue` then).
-                        # TODO: When no each-line marker specified, extract with
-                        #       alignment from `begin_match`.
+                        if marker_set[1] == "":
+                            # When no each-line marker is set (i.e. for Python
+                            # docstrings), then align the comment to the
+                            # start-marker.
+                            stripped_content = (
+                                content[line2][begin_match.begin():])
+                        else:
+                            stripped_content = content[line2].lstrip()
 
-                        docstring += content[line2]
-                        pos += len(content[line2])
+                            # Check whether we violate the each-line marker
+                            # "rule".
+                            if (stripped_content[:len(marker_set[1])] !=
+                                    marker_set[1])
+                                continue
+
+                            stripped_content = (
+                                stripped_content[len(marker_set[1]):])
+
+                        # TODO: Consider these cases:
+                        #   """hello
+                        #   world"""
+                        # TODO AND
+                        #  /**
+                        # x * An x before the asterisk */
+
+                        docstring += stripped_content
                         line2 += 1
 
-                        # TODO: Expand try block more outside for performance
-                        #       reasons. Because setting permanently up an
-                        #       exception stack costs time...
-                        try:
-                            end_marker_pos = content[line2].find(marker_set[2])
-                        except IndexError:
+                        if line2 >= len(content)
+                            # End of content reached, so there's no closing
+                            # marker and that's a mismatch.
                             continue
+
+                        end_marker_pos = content[line2].find(marker_set[2])
 
                     docstring += content[line2][:end_marker_pos]
                     line = line2
@@ -104,49 +130,6 @@ def _extract_documentation(content, docstyle_definition):
 
 
 # TODO TextPosition + TextRange tests.
-
-# TODO Adapt algorithm to above. Or just replace the name:
-#      (_extract_documentation -> extract_documentation_with_docstyle)...
-def extract_documentation_with_docstyle(content, docstyle_definition):
-    """
-    Extracts all documentation texts inside the given source-code-string.
-
-    For more information about how documentation comments are identified and
-    extracted, see DocstyleDefinition.doctypes enumeration.
-
-    :param content:             The source-code-string where to extract
-                                documentation from.
-    :param docstyle_definition: The DocstyleDefinition that identifies the
-                                documentation comments.
-    :raises ValueError:         Raised when the docstyle definition markers
-                                have an invalid format.
-    :return:                    An iterator returning each documentation text
-                                found in the content.
-    """
-
-    try:
-        results = _extract[docstyle_definition.doctype](content, *markers)
-
-        # We want to check whether we invoke everything correctly when
-        # unpacking markers, so let this routine be the generator that yields
-        # the results and the actual function return the generator so the
-        # initial part is executed.
-        def extract_documentation_with_docstyle_generator():
-            for result in results:
-                yield DocumentationComment(result[1],
-                                           docstyle_definition,
-                                           result[0])
-
-        return extract_documentation_with_docstyle_generator()
-
-    except TypeError:
-        raise ValueError(
-            "Docstyle-setting for language {} defined in docstyle {} for "
-            "doctype {} has an invalid format. For more information about "
-            "documentation marker settings see `DocstyleDefinition` object."
-            .format(repr(docstyle_definition.language),
-                    repr(docstyle_definition.docstyle),
-                    repr(docstyle_definition.doctype)))
 
 
 def extract_documentation(content, language, docstyle):
