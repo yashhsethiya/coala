@@ -40,7 +40,10 @@ class TextRange:
 
         :param start_line:   The line number of the start position.
         :param start_column: The column number of the start position.
-        :param end_line:     The line number of the end position.
+        :param end_line:     The line number of the end position. If this
+                             parameter is `None`, then the end position is set
+                             the same like start position and end_column gets
+                             ignored.
         :param end_column:   The column number of the end position.
         :return:             A TextRange.
         """
