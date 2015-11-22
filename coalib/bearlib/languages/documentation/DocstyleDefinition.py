@@ -14,6 +14,9 @@ class DocstyleDefinition:
     etc.).
     """
 
+    # TODO: Allow flattened tuple when providing a single marker_set.
+    # TODO: Type checks? This class is not involved in critical processes, a
+    #       robust user friendly frontend would be good...
     def __init__(self, language, docstyle, markers):
         """
         Instantiates a new DocstyleDefinition.
@@ -130,6 +133,8 @@ class DocstyleDefinition:
         """
 
         try:
+            # TODO: Instantiate a ConfParser that allows empty elements in
+            #       tuples. This feature will come the next time...
             docstyle_settings = ConfParser().parse(os.path.dirname(__file__) +
                                                    "/" + docstyle + ".coalang")
         except FileNotFoundError as ex:

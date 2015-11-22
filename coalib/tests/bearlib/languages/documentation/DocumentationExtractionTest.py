@@ -4,8 +4,7 @@ import sys
 
 sys.path.insert(0, ".")
 from coalib.bearlib.languages.documentation.DocstyleDefinition import (
-    DocstyleDefinition,
-    DOCTYPES)
+    DocstyleDefinition)
 from coalib.bearlib.languages.documentation.DocumentationComment import (
     DocumentationComment)
 from coalib.bearlib.languages.documentation.DocumentationExtraction import (
