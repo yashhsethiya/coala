@@ -3,7 +3,7 @@ from operator import attrgetter, itemgetter
 import re
 
 from coalib.bearlib.languages.documentation.DocstyleDefinition import (
-    DocstyleDefinition,
+    DocstyleDefinition)
 from coalib.bearlib.languages.documentation.DocumentationComment import (
     DocumentationComment)
 from coalib.parsing.StringProcessing import search_in_between
@@ -84,7 +84,7 @@ def extract_documentation_with_docstyle(content, docstyle_definition):
                             # Check whether we violate the each-line marker
                             # "rule".
                             if (stripped_content[:len(marker_set[1])] !=
-                                    marker_set[1])
+                                    marker_set[1]):
                                 continue
 
                             stripped_content = (
@@ -100,7 +100,7 @@ def extract_documentation_with_docstyle(content, docstyle_definition):
                         docstring += stripped_content
                         line2 += 1
 
-                        if line2 >= len(content)
+                        if line2 >= len(content):
                             # End of content reached, so there's no closing
                             # marker and that's a mismatch.
                             continue
