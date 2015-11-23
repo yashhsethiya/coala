@@ -14,9 +14,9 @@ class DocstyleDefinition:
     etc.).
     """
 
-    # TODO: Allow flattened tuple when providing a single marker_set.
+    # TODO: Allow flattened tuple when providing a single marker_set. TEST THAT!
     # TODO: Type checks? This class is not involved in critical processes, a
-    #       robust user friendly frontend would be good...
+    #       robust user friendly frontend would be good... TEST THAT!
     def __init__(self, language, docstyle, markers):
         """
         Instantiates a new DocstyleDefinition.
@@ -132,14 +132,18 @@ class DocstyleDefinition:
                                    and docstyle.
         """
 
+        docstyle = docstyle.lower()
+
         try:
             # TODO: Instantiate a ConfParser that allows empty elements in
             #       tuples. This feature will come the next time...
-            docstyle_settings = ConfParser().parse(os.path.dirname(__file__) +
-                                                   "/" + docstyle + ".coalang")
+            docstyle_settings = ConfParser().parse(
+                os.path.dirname(__file__) + "/" + docstyle + ".coalang")
         except FileNotFoundError as ex:
-            raise type(ex)("Docstyle definition " + repr(docstyle) +
-                           " not found.")
+            raise type(ex)("Docstyle definition " + repr(docstyle) + " not "
+                           "found.")
+
+        language = language.lower()
 
         try:
             docstyle_settings = docstyle_settings[language]
@@ -147,6 +151,7 @@ class DocstyleDefinition:
             raise KeyError("Language {} is not defined for docstyle {}."
                            .format(repr(language), repr(docstyle)))
 
-        marker_sets = (value for value in docstyle_settings.values())
+        marker_sets = (tuple(value)
+                       for value in docstyle_settings.contents.values())
 
         return cls(language, docstyle, marker_sets)
