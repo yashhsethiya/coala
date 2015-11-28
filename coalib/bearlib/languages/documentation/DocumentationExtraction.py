@@ -120,7 +120,7 @@ def extract_documentation_with_docstyle(content, docstyle_definition):
                                             line_pos)
 
                 yield DocumentationComment(docstring,
-                                           docstyle,
+                                           docstyle_definition,
                                            marker_set,
                                            rng)
                 break
