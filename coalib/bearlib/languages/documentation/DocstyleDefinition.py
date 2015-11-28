@@ -71,9 +71,9 @@ class DocstyleDefinition:
         A tuple of marker sets that identify a documentation comment.
 
         Marker sets consist of 3 entries where the first is the start-marker,
-        the second one the each-line marker and the last one the end-marker. For
-        example a marker tuple with a single marker set `(("/**", "*", "*/"),)`
-        would match following documentation comment:
+        the second one the each-line marker and the last one the end-marker.
+        For example a marker tuple with a single marker set
+        `(("/**", "*", "*/"),)` would match following documentation comment:
 
         ```
         /**
@@ -90,8 +90,8 @@ class DocstyleDefinition:
          */
         ```
 
-        Markers are matched "greedy", that means it will match as many each-line
-        markers as possible. I.e. for `("///", "///", "///")`):
+        Markers are matched "greedy", that means it will match as many
+        each-line markers as possible. I.e. for `("///", "///", "///")`):
 
         ```
         /// Brief documentation.
@@ -115,14 +115,14 @@ class DocstyleDefinition:
 
         :param language:           The programming language. For example
                                    `"CPP"` for C++ or `"PYTHON3"` for Python 3.
-                                   The given string is automatically lowered, so
-                                   passing i.e. "CPP" or "cpp" makes no
+                                   The given string is automatically lowered,
+                                   so passing i.e. "CPP" or "cpp" makes no
                                    difference.
         :param docstyle:           The documentation style/tool used. For
                                    example `"default"` or `"doxygen"`.
-                                   The given string is automatically lowered, so
-                                   passing i.e. "default" or "DEFAULT" makes no
-                                   difference.
+                                   The given string is automatically lowered,
+                                   so passing i.e. "default" or "DEFAULT" makes
+                                   no difference.
         :raises FileNotFoundError: Raised when the given docstyle was not
                                    found. This is a compatability exception
                                    from `coalib.misc.Compatability` module.

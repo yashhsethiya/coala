@@ -15,7 +15,8 @@ class TextRange:
         :param start:       A TextPosition indicating the start of the range.
                             Can't be `None`.
         :param end:         A TextPosition indicating the end of the range. If
-                            `None` is given, the start object will be used here.
+                            `None` is given, the start object will be used
+                            here.
         :raises TypeError:  Raised when
                             - start is no TextPosition or None.
                             - end is no TextPosition.

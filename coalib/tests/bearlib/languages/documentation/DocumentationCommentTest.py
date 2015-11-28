@@ -25,7 +25,10 @@ class DocumentationCommentTest(unittest.TestCase):
 
         docdef = DocstyleDefinition("PYTHON", "doxygen", (("##", "#", "#"),))
 
-        uut = DocumentationComment("qwertzuiop", docdef, ("##", "#", "#"), None)
+        uut = DocumentationComment("qwertzuiop",
+                                   docdef,
+                                   ("##", "#", "#"),
+                                   None)
 
         self.assertEqual(uut.documentation, "qwertzuiop")
         self.assertEqual(str(uut), "qwertzuiop")
