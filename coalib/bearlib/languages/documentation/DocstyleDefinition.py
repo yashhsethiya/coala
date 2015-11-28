@@ -38,6 +38,8 @@ class DocstyleDefinition:
         self._docstyle = docstyle.lower()
         self._markers = tuple(tuple(marker_set) for marker_set in markers)
 
+        print(self._markers)
+
         # Check marker set dimensions.
         for marker_set in self._markers:
             length = len(marker_set)
