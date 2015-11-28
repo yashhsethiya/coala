@@ -157,8 +157,5 @@ def extract_documentation(content, language, docstyle):
     :return:                   An iterator returning each DocumentationComment
                                found in the content.
     """
-    docstyle_definitions = DocstyleDefinition.load(language, docstyle)
-
-    chained = chain(*(extract_documentation_with_docstyle(content, definition)
-                      for definition in docstyle_definitions))
-    return sorted(chained, key=attrgetter("range"))
+    docstyle_definition = DocstyleDefinition.load(language, docstyle)
+    return extract_documentation_with_docstyle(content, docstyle_definition)
