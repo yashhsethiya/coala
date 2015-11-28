@@ -13,6 +13,9 @@ from coalib.bearlib.languages.documentation.DocumentationExtraction import (
 from coalib.misc.Compatability import FileNotFoundError
 
 
+# TODO Insert alternate-style (for doxygen) comments between normal ones to
+#      assert for order. (Python, cpp)
+
 class DocumentationExtractionTest(unittest.TestCase):
     def test_extract_documentation_with_docstyle_invalid_input(self):
         with self.assertRaises(ValueError):
@@ -123,36 +126,32 @@ class DocumentationExtractionTest(unittest.TestCase):
     def test_extract_documentation_PYTHON3(self):
         data = DocumentationExtractionTest.load_testdata(".py")
 
-        docstyle_PYTHON3_default_simple = DocstyleDefinition(
+        PYTHON3_marker1 = ('"""', '', '"""')
+        PYTHON3_marker2 = ('##', '#', '#')
+        docstyle_PYTHON3_default = DocstyleDefinition(
             "PYTHON3",
             "default",
-            DOCTYPES.simple,
-            ('"""', '"""'))
+            (PYTHON3_marker1,))
 
-        docstyle_PYTHON3_doxygen_simple = DocstyleDefinition(
+        docstyle_PYTHON3_doxygen = DocstyleDefinition(
             "PYTHON3",
             "doxygen",
-            DOCTYPES.simple,
-            ('"""', '"""'))
-
-        docstyle_PYTHON3_doxygen_continuous = DocstyleDefinition(
-            "PYTHON3",
-            "doxygen",
-            DOCTYPES.continuous,
-            ("##", "#"))
+            (PYTHON3_marker1, PYTHON3_marker2))
 
         expected = (DocumentationComment(
                         ("\n"
                          "Module description.\n"
                          "\n"
                          "Some more foobar-like text.\n"),
-                        docstyle_PYTHON3_default_simple,
+                        docstyle_PYTHON3_default,
+                        PYTHON3_marker1,
                         (0, 56)),
                     DocumentationComment(
                         ("\n"
                          "A nice and neat way of documenting code.\n"
                          ":param radius: The explosion radius.\n"),
-                        docstyle_PYTHON3_default_simple,
+                        docstyle_PYTHON3_default,
+                        PYTHON3_marker1,
                         (92, 189)),
                     DocumentationComment(
                         ("\n"
@@ -161,12 +160,14 @@ class DocumentationExtractionTest(unittest.TestCase):
                          "layouts inside docs are not preserved for these "
                          "documentation styles.\n"
                          "this is intended.\n"),
-                        docstyle_PYTHON3_default_simple,
+                        docstyle_PYTHON3_default,
+                        PYTHON3_marker1,
                         (200, 330)),
                     DocumentationComment(
                         (" Docstring directly besides triple quotes.\n"
                          "Continues here. "),
-                        docstyle_PYTHON3_default_simple,
+                        docstyle_PYTHON3_default,
+                        PYTHON3_marker1,
                         (332, 401)))
 
         self.assertEqual(
@@ -184,7 +185,8 @@ class DocumentationExtractionTest(unittest.TestCase):
                           " More subtext (not correctly aligned)\n"
                           "      sub-sub-text\n"
                           "\n"),
-                      docstyle_PYTHON3_doxygen_continuous,
+                      docstyle_PYTHON3_doxygen,
+                      PYTHON3_marker2,
                       (404, 521)),)
 
         self.assertEqual(
