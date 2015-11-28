@@ -134,10 +134,9 @@ class DocstyleDefinition:
 
         docstyle = docstyle.lower()
 
+        language_config_parser = ConfParser(remove_empty_iter_elements=False)
         try:
-            # TODO: Instantiate a ConfParser that allows empty elements in
-            #       tuples. This feature will come the next time...
-            docstyle_settings = ConfParser().parse(
+            docstyle_settings = language_config_parser.parse(
                 os.path.dirname(__file__) + "/" + docstyle + ".coalang")
         except FileNotFoundError as ex:
             raise type(ex)("Docstyle definition " + repr(docstyle) + " not "

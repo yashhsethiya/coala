@@ -56,13 +56,11 @@ class DocstyleDefinitionTest(unittest.TestCase):
 
         # Test python 3 default configuration and if everything is parsed
         # right.
-        result = tuple(DocstyleDefinition.load("PYTHON3", "default"))
-        self.assertEqual(len(result), 1)
+        result = DocstyleDefinition.load("PYTHON3", "default")
 
-        self.assertEqual(result[0].language, "python3")
-        self.assertEqual(result[0].docstyle, "default")
-        self.assertEqual(result[0].doctype, DOCTYPES.simple)
-        self.assertEqual(result[0].markers, ('"""', '"""'))
+        self.assertEqual(result.language, "python3")
+        self.assertEqual(result.docstyle, "default")
+        self.assertEqual(result.markers, (('"""', '', '"""'),))
 
 
 if __name__ == '__main__':
