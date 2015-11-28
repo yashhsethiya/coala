@@ -20,48 +20,21 @@ class DocumentationExtractionTest(unittest.TestCase):
                 "",
                 DocstyleDefinition("C",
                                    "default",
-                                   DOCTYPES.standard,
-                                   ("A", "B", "C", "D")))
+                                   [["A", "B", "C", "D"]]))
 
         with self.assertRaises(ValueError):
             extract_documentation_with_docstyle(
                 "",
                 DocstyleDefinition("C",
                                    "default",
-                                   DOCTYPES.standard,
-                                   ("A", "B")))
+                                   [["A", "B"]]))
 
         with self.assertRaises(ValueError):
             extract_documentation_with_docstyle(
                 "",
                 DocstyleDefinition("C",
                                    "default",
-                                   DOCTYPES.simple,
-                                   ("A",)))
-
-        with self.assertRaises(ValueError):
-            extract_documentation_with_docstyle(
-                "",
-                DocstyleDefinition("C",
-                                   "default",
-                                   DOCTYPES.simple,
-                                   ("A", "B", "C")))
-
-        with self.assertRaises(ValueError):
-            extract_documentation_with_docstyle(
-                "",
-                DocstyleDefinition("C",
-                                   "default",
-                                   DOCTYPES.continuous,
-                                   ("A", "B", "C")))
-
-        with self.assertRaises(ValueError):
-            extract_documentation_with_docstyle(
-                "",
-                DocstyleDefinition("C",
-                                   "default",
-                                   DOCTYPES.continuous,
-                                   ("A",)))
+                                   [["A"]]))
 
     def test_extract_documentation_invalid_input(self):
         with self.assertRaises(FileNotFoundError):
@@ -83,10 +56,10 @@ class DocumentationExtractionTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             tuple(extract_documentation(data, "C", "default"))
 
+        C_marker = ("/**", "*", "*/")
         docstyle_C_doxygen = DocstyleDefinition("C",
                                                 "doxygen",
-                                                DOCTYPES.standard,
-                                                ("/**", "*", "*/"))
+                                                (C_marker,))
 
         self.assertEqual(tuple(extract_documentation(data, "C", "doxygen")),
                          (DocumentationComment(
@@ -95,11 +68,13 @@ class DocumentationExtractionTest(unittest.TestCase):
                                "\n"
                                " @returns Your favorite number.\n"),
                               docstyle_C_doxygen,
+                              C_marker,
                               (21, 95)),
-                           DocumentationComment(
+                          DocumentationComment(
                               (" foobar = barfoo.\n"
                                " @param x whatever...\n"),
                               docstyle_C_doxygen,
+                              C_marker,
                               (182, 230))))
 
     def test_extract_documentation_CPP(self):
@@ -109,16 +84,11 @@ class DocumentationExtractionTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             tuple(extract_documentation(data, "CPP", "default"))
 
-        docstyle_CPP_doxygen_standard = DocstyleDefinition(
-            "CPP",
-            "doxygen",
-            DOCTYPES.standard,
-            ("/**", "*", "*/"))
-        docstyle_CPP_doxygen_continuous = DocstyleDefinition(
-            "CPP",
-            "doxygen",
-            DOCTYPES.continuous,
-            ("///", "///"))
+        CPP_marker1 = ("/**", "*", "*/")
+        CPP_marker2 = ("///", "///", "///")
+        docstyle_CPP_doxygen = DocstyleDefinition("CPP",
+                                                  "doxygen",
+                                                  (CPP_marker1, CPP_marker2))
 
         self.assertEqual(tuple(extract_documentation(data, "CPP", "doxygen")),
                          (DocumentationComment(
@@ -126,16 +96,19 @@ class DocumentationExtractionTest(unittest.TestCase):
                                " This is the main function.\n"
                                " @returns Exit code.\n"
                                "          Or any other number.\n"),
-                              docstyle_CPP_doxygen_standard,
+                              docstyle_CPP_doxygen,
+                              CPP_marker1,
                               (22, 115)),
                           DocumentationComment(
                               (" foobar\n"
                                " @param xyz\n"),
-                              docstyle_CPP_doxygen_standard,
+                              docstyle_CPP_doxygen,
+                              CPP_marker1,
                               (174, 202)),
                           DocumentationComment(
                               " Some alternate style of documentation\n",
-                              docstyle_CPP_doxygen_continuous,
+                              docstyle_CPP_doxygen,
+                              CPP_marker2,
                               (256, 298)),
                           DocumentationComment(
                               (" Should work\n"
@@ -143,7 +116,8 @@ class DocumentationExtractionTest(unittest.TestCase):
                                " even without a function standing below.\n"
                                "\n"
                                " @param foo WHAT PARAM PLEASE!?\n"),
-                              docstyle_CPP_doxygen_continuous,
+                              docstyle_CPP_doxygen,
+                              CPP_marker2,
                               (324, 427))))
 
     def test_extract_documentation_PYTHON3(self):

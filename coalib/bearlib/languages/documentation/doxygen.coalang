@@ -48,7 +48,7 @@ doc-marker1 = """, , """
 doc-marker2 = \#\#, , \#
 
 [TCL]
-doc-marker = ##, , #
+doc-marker = \#\#, , \#
 
 [VHDL]
 doc-marker = --!, , --!
