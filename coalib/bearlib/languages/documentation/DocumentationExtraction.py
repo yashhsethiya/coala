@@ -77,7 +77,7 @@ def extract_documentation_with_docstyle(content, docstyle_definition):
                             # docstrings), then align the comment to the
                             # start-marker.
                             stripped_content = (
-                                content[line2][begin_match.begin():])
+                                content[line2][begin_match.start():])
                         else:
                             stripped_content = content[line2].lstrip()
 
@@ -115,7 +115,7 @@ def extract_documentation_with_docstyle(content, docstyle_definition):
                 line_pos = end_marker_pos + len(marker_set[2])
 
                 rng = TextRange.from_values(begin_match_line,
-                                            begin_match.begin(),
+                                            begin_match.start(),
                                             line,
                                             line_pos)
 
@@ -127,9 +127,6 @@ def extract_documentation_with_docstyle(content, docstyle_definition):
         else:
             line += 1
             line_pos = 0
-
-
-# TODO TextPosition + TextRange tests.
 
 
 def extract_documentation(content, language, docstyle):

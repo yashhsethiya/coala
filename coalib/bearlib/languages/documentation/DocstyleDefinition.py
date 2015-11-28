@@ -151,6 +151,8 @@ class DocstyleDefinition:
                            .format(repr(language), repr(docstyle)))
 
         marker_sets = (tuple(value)
-                       for value in docstyle_settings.contents.values())
+                       for key, value in
+                           filter(lambda kv: not kv[0].startswith("comment"),
+                                  docstyle_settings.contents.items()))
 
         return cls(language, docstyle, marker_sets)
