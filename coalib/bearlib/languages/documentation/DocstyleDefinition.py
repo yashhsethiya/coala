@@ -1,4 +1,8 @@
+import os.path
+
+from coalib.misc.Compatability import FileNotFoundError
 from coalib.misc.Decorators import generate_eq, generate_repr
+from coalib.parsing.ConfParser import ConfParser
 
 
 @generate_repr()
@@ -92,3 +96,56 @@ class DocstyleDefinition:
                  documentation comment.
         """
         return self._markers
+
+    @classmethod
+    def load(cls, language, docstyle):
+        """
+        Returns a `DocstyleDefinition` defined for the given language and
+        docstyle from the coala docstyle definition files.
+
+        The marker settings are loaded from the according coalang-files. Each
+        setting inside them are considered a marker setting.
+
+        :param language:           The programming language. For example
+                                   `"CPP"` for C++ or `"PYTHON3"` for Python 3.
+                                   The given string is automatically lowered,
+                                   so passing i.e. "CPP" or "cpp" makes no
+                                   difference.
+        :param docstyle:           The documentation style/tool used. For
+                                   example `"default"` or `"doxygen"`.
+                                   The given string is automatically lowered,
+                                   so passing i.e. "default" or "DEFAULT" makes
+                                   no difference.
+        :raises FileNotFoundError: Raised when the given docstyle was not
+                                   found. This is a compatability exception
+                                   from `coalib.misc.Compatability` module.
+        :raises KeyError:          Raised when the given language is not
+                                   defined for given docstyle.
+        :return:                   The `DocstyleDefinition` for giving language
+                                   and docstyle.
+        """
+
+        docstyle = docstyle.lower()
+
+        language_config_parser = ConfParser(remove_empty_iter_elements=False)
+        try:
+            docstyle_settings = language_config_parser.parse(
+                os.path.dirname(__file__) + "/" + docstyle + ".coalang")
+        except FileNotFoundError as ex:
+            raise type(ex)("Docstyle definition " + repr(docstyle) + " not "
+                           "found.")
+
+        language = language.lower()
+
+        try:
+            docstyle_settings = docstyle_settings[language]
+        except KeyError:
+            raise KeyError("Language {} is not defined for docstyle {}."
+                           .format(repr(language), repr(docstyle)))
+
+        marker_sets = (tuple(value)
+                       for key, value in
+                           filter(lambda kv: not kv[0].startswith("comment"),
+                                  docstyle_settings.contents.items()))
+
+        return cls(language, docstyle, marker_sets)
