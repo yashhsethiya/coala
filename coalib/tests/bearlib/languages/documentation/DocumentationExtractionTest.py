@@ -14,6 +14,9 @@ from coalib.misc.Compatability import FileNotFoundError
 from coalib.results.TextRange import TextRange
 
 
+# TODO Insert alternate-style (for doxygen) comments between normal ones to
+#      assert for order. (Python, cpp)
+
 class DocumentationExtractionTest(unittest.TestCase):
     def test_extract_documentation_with_docstyle_invalid_input(self):
         with self.assertRaises(ValueError):

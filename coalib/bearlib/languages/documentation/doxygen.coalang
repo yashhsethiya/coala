@@ -1,3 +1,12 @@
+# TODO:
+# - Objective C (need a representative abbreviation)
+# - PHP
+# - "synonyms"? --> [OBJC, OBJECTIVE-C] or [CPP, C-PLUS-PLUS, CPLUSPLUS] for example
+# - if synonyms are possible --> [PYTHON, PYTHON2]
+# - tests?
+# - relook at the doxygen specification for languages below, since the system changed^^
+
+
 [C]
 doc-marker1 = /**, \ *, \ */
 doc-marker2 = /**, , \ */

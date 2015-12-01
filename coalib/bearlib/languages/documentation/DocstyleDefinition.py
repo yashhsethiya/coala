@@ -14,6 +14,10 @@ class DocstyleDefinition:
     etc.).
     """
 
+    # TODO: Allow flattened tuple when providing a single marker_set.
+    #       TEST THAT!
+    # TODO: Type checks? This class is not involved in critical processes, a
+    #       robust user friendly frontend would be good... TEST THAT!
     def __init__(self, language, docstyle, markers):
         """
         Instantiates a new DocstyleDefinition.

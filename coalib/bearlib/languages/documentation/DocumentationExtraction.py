@@ -7,6 +7,11 @@ from coalib.bearlib.languages.documentation.DocumentationComment import (
 from coalib.results.TextRange import TextRange
 
 
+#TODO - Implement Match also for `split` and `search_for`? File an issue
+#TODO - document currently existing docstyles from coala side?
+#TODO - Add ''' ''' as markers for python 2/3 inside doc-definition files.
+
+
 def extract_documentation_with_docstyle(content, docstyle_definition):
     """
     Extracts all documentation texts inside the given source-code-string.
@@ -123,6 +128,8 @@ def extract_documentation_with_docstyle(content, docstyle_definition):
                                     stripped_content = (
                                         content[line2][begin_match.start()
                                                        + len(marker_set[1]):])
+
+                                # TODO Test also other C style doccomments
 
                                 docstring += stripped_content
                                 line2 += 1
