@@ -63,3 +63,6 @@ bears = KeywordBear
 
 ci_keywords = \#TODO, \# TODO, \#FIXME, \# FIXME
 cs_keywords =
+
+[DEBUG]
+bears = GitCommitBear
