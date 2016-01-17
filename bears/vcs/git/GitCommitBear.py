@@ -7,35 +7,41 @@ from coalib.results.Result import Result
 
 class GitCommitBear(GlobalBear):
     def run(self,
-            shortlog_line_length: int=80,
-            detaillog_line_length: int=80):
-        # TODO Docs - Important -> say that \n at end is not included when
-        # checking length! so it's \n-exclusive.
+            shortlog_length: int=50,
+            detaillog_line_length: int=73):
         """
+        Checks the current git commit message at HEAD.
 
+        This bear ensures that the shortlog and detaillog do not exceed a given
+        line-length and that a newline lies between them.
+
+        :param shortlog_length:       The maximum length of the shortlog. The
+                                      shortlog is the first line of the commit
+                                      message. The newline character at end
+                                      does not count to the length.
+        :param detaillog_line_length: The maximum line-length of the detaillog.
+                                      The detaillog follows the shortlog after
+                                      a newline. The newline character at each
+                                      line end does not count to the length.
         """
         command = "git log -1 --pretty=%B"
         std, err = self.run_command(command)
 
         if err:
-            self.err("Current working directory is no git repository!")
+            self.err("git:", repr(err))
             return
 
+        # git automatically removes trailing whitespaces.
+
         std = std.splitlines()
-        stripped_std = [line.rstrip() for line in std]
 
-        if std != stripped_std:
-            yield Result(self,
-                         "The commit message contains trailing whitespaces.")
-
-        it = iter(stripped_std)
-        if len(next(it)) > shortlog_line_length + 1:
+        if len(std[0]) > shortlog_length + 1:
             yield Result(self, "Shortlog of HEAD commit is too long.")
 
-        if next(it) != "":
+        if std[1] != "":
             yield Result(self, "No newline between shortlog and detaillog.")
 
-        for line in it:
+        for line in std[2:]:
             if len(line) > detaillog_line_length + 1:
                 yield Result(
                     self,
