@@ -4,7 +4,7 @@ from subprocess import Popen, PIPE
 from coalib.bears.GlobalBear import GlobalBear
 from coalib.results.Result import Result
 
-
+#
 class GitCommitBear(GlobalBear):
     def run(self,
             shortlog_length: int=50,
