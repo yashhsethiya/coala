@@ -36,26 +36,49 @@ class GitCommitBear(GlobalBear):
             self.err("git:", repr(err))
             return
 
-        # git automatically removes trailing whitespaces.
-        std = std.splitlines()
+        # git automatically removes trailing whitespaces. It also appends an
+        # empty line.
+        std = std.splitlines()[:-1]
 
-        if len(std) == 1:
+        if len(std) == 0:
             if not allow_empty_commit_message:
                 yield Result(self, "HEAD commit has no message.")
             return
 
-        if len(std[0]) > shortlog_length + 1:
+        yield from self.check_shortlog(shortlog_length, std[0])
+        yield from self.check_body(body_line_length, force_body, std[1:])
+
+    def check_shortlog(self, shortlog_length, shortlog):
+        """
+        Checks the given shortlog.
+
+        :param shortlog_length: The maximum length of the shortlog. The newline
+                                character at end does not count to the length.
+        :param shortlog:        The shortlog message string.
+        """
+        if len(shortlog) > shortlog_length + 1:
             yield Result(self, "Shortlog of HEAD commit is too long.")
 
-        if std[1] != "":
+    def check_body(self, body_line_length, force_body, body):
+        """
+        Checks the given commit body.
+
+        :param body_line_length: The maximum line-length of the body. The
+                                 newline character at each line end does not
+                                 count to the length.
+        :param force_body:       Whether a body shall exist or not.
+        :param body:             The commit body splitted by lines.
+        """
+        if len(body) == 0:
+            if force_body:
+                yield Result(self, "No commit message body at HEAD.")
+            return
+
+        if body[0] != "":
             yield Result(self, "No newline between shortlog and body at HEAD.")
+            return
 
-        body = std[2:]
-
-        if force_body and len(std) == 0:
-            yield Result(self, "No commit message body at HEAD.")
-
-        if any(len(line) > body_line_length + 1 for line in body):
+        if any(len(line) > body_line_length + 1 for line in body[1:]):
             yield Result(self, "Body of HEAD commit contains too long lines.")
 
     @staticmethod
