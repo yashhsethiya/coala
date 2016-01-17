@@ -8,21 +8,26 @@ from coalib.results.Result import Result
 class GitCommitBear(GlobalBear):
     def run(self,
             shortlog_length: int=50,
-            detaillog_line_length: int=73):
+            body_line_length: int=73,
+            force_body: bool=False,
+            allow_empty_commit_message: bool=False):
         """
         Checks the current git commit message at HEAD.
 
-        This bear ensures that the shortlog and detaillog do not exceed a given
+        This bear ensures that the shortlog and body do not exceed a given
         line-length and that a newline lies between them.
 
-        :param shortlog_length:       The maximum length of the shortlog. The
-                                      shortlog is the first line of the commit
-                                      message. The newline character at end
-                                      does not count to the length.
-        :param detaillog_line_length: The maximum line-length of the detaillog.
-                                      The detaillog follows the shortlog after
-                                      a newline. The newline character at each
-                                      line end does not count to the length.
+        :param shortlog_length:            The maximum length of the shortlog.
+                                           The shortlog is the first line of
+                                           the commit message. The newline
+                                           character at end does not count to
+                                           the length.
+        :param body_line_length:           The maximum line-length of the body.
+                                           The newline character at each line
+                                           end does not count to the length.
+        :param force_body:                 Whether a body shall exist or not.
+        :param allow_empty_commit_message: Whether empty commit messages are
+                                           allowed or not.
         """
         command = "git log -1 --pretty=%B"
         std, err = self.run_command(command)
@@ -32,21 +37,26 @@ class GitCommitBear(GlobalBear):
             return
 
         # git automatically removes trailing whitespaces.
-
         std = std.splitlines()
+
+        if len(std) == 1:
+            if not allow_empty_commit_message:
+                yield Result(self, "HEAD commit has no message.")
+            return
 
         if len(std[0]) > shortlog_length + 1:
             yield Result(self, "Shortlog of HEAD commit is too long.")
 
         if std[1] != "":
-            yield Result(self, "No newline between shortlog and detaillog.")
+            yield Result(self, "No newline between shortlog and body at HEAD.")
 
-        for line in std[2:]:
-            if len(line) > detaillog_line_length + 1:
-                yield Result(
-                    self,
-                    "Detaillog of HEAD commit contains too long lines.")
-                break
+        body = std[2:]
+
+        if force_body and len(std) == 0:
+            yield Result(self, "No commit message body at HEAD.")
+
+        if any(len(line) > body_line_length + 1 for line in body):
+            yield Result(self, "Body of HEAD commit contains too long lines.")
 
     @staticmethod
     def run_command(command):
