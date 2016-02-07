@@ -1,9 +1,15 @@
+import traceback
+
 from coalib.misc.Decorators import enforce_signature
+from coalib.settings.FunctionMetadata import FunctionMetadata
+from coalib.settings.Section import Section
 
 
+#TODO Dependencies?
+#TODO generate_repr: auto mode
 class Bear:
     @enforce_signature
-    def __init__(self, section: Section, comq):
+    def __init__(self, section: Section, comq, files):
         """
         Constructs a new bear.
 
@@ -13,10 +19,13 @@ class Bear:
                               directly inside different processes when using
                               `execute()` inside a different one, be sure to
                               use a manager to retrieve a queue.
+        :param files:         An iterable of `coalib.processes.MemoryFile`
+                              objects to process.
         :raises RuntimeError: Raised when bear requirements are not fulfilled.
         """
         self.section = section
         self.comq = comq
+        self.files = tuple(files)
 
         cp = type(self).check_prerequisites()
         if cp is not True:
@@ -27,8 +36,8 @@ class Bear:
 
             self.warn(error_string)
 
-    # Use LogRecord from `logging` to generate log objects.
-    # Mention that they are intended for use inside `run`.
+    # TODO Use LogRecord from `logging` to generate log objects.
+    #      Mention that they are intended for use inside `run`.
     def debug(self, msg):
         pass
     def warn(self, msg):
@@ -38,6 +47,7 @@ class Bear:
     def error(self, msg):
         pass
     def log(self, level, msg):
+        pass
         # TODO Logging calls propagate down here.
         # TODO Actual logging
 
@@ -46,24 +56,41 @@ class Bear:
     # task arguments.
 
     def _on_generate_tasks(self):
-        # THIS ONE IS OVERRIDEN BY USER, NOT generate_tasks()!!!
-        # For simplicity: maybe just allow kwargs? Assume that for now...
+        """
+        Gets called when `generate_tasks()` is also called.
+
+        Override this function to provide your own task management.
+
+        :return: An iterable of dicts containing the key-value arguments passed
+                 to `execute()`.
+        """
         raise NotImplementedError
 
     def generate_tasks(self):
         execution_args = self._on_generate_tasks()
         try:
-            execution_args.update(
-                self.get_metadata().create_params_from_section(self.section))
+            for arg_dict in execution_args:
+                arg_dict.update(self.get_metadata().create_params_from_section(
+                    self.section))
         except ValueError:
+            pass
             # TODO What doing here? In fact the error should bubble up, tasks
             #      cannot be generated due to missing values.
         return execution_args
+
         # So: execute() allows to get *args also, but generate_tasks() forbids
         #     that for simplicity.
 
     def execute(self, *args, **kwargs):
-        # TODO Mention that log messages are put inside the given queue.
+        """
+        Executes the bear.
+
+        Exceptions and other status messages are put into `self.comq`, the
+        message queue.
+
+        :param args:   Positional arguments to pass to `run()`.
+        :param kwargs: Key-value arguments to pass to `run()`.
+        """
         name = type(self).__name__
         try:
             self.debug("Running bear {}...".format(repr(name)))
@@ -83,6 +110,13 @@ class Bear:
                 "\n".format(bear=name, traceback=traceback.format_exc()))
 
     def run(self, *args, **kwargs):
+        """
+        Runs the bear analysis routine.
+
+        :param args:   Arbitrary positional arguments.
+        :param kwargs: Arbitrary key-value arguments.
+        :return:       An iterable of `coalib.results.Result`s.
+        """
         raise NotImplementedError
 
     @classmethod
@@ -120,5 +154,3 @@ class Bear:
                  that serves a more detailed description of what's missing.
         """
         return True
-
-    #TODO Dependencies?

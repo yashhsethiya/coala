@@ -1,8 +1,9 @@
 from collections import Iterable
 
-from coalib.misc.decorators import enforce_signature
+from coalib.misc.Decorators import enforce_signature
 
 
+#TODO generate_repr
 class MemoryFile:
     """
     A `MemoryFile` stores different content representations of a file in memory
@@ -60,6 +61,6 @@ class MemoryFile:
         :return: The splitted content.
         """
         if self.__splitted_content is None:
-            self.__splitted_content = self.__string_content.split(True)
+            self.__splitted_content = self.__string_content.splitlines(True)
 
         return self.__splitted_content
