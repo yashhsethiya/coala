@@ -1,12 +1,12 @@
 import traceback
 
 from coalib.bears.BearLogMessage import BearLogMessage
-from coalib.misc.Decorators import enforce_signature
+from coalib.misc.Decorators import enforce_signature, generate_repr
 from coalib.settings.FunctionMetadata import FunctionMetadata
 from coalib.settings.Section import Section
 
 #TODO Dependencies?
-#TODO generate_repr: auto mode
+@generate_repr()
 class Bear:
     @enforce_signature
     def __init__(self, section: Section, comq, files):

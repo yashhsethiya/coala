@@ -3,6 +3,7 @@ from collections import Iterable
 from coalib.misc.Decorators import enforce_signature
 
 
+#TODO Load file on demand.
 #TODO generate_repr
 class MemoryFile:
     """
