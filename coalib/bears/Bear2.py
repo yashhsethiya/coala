@@ -1,9 +1,9 @@
 import traceback
 
+from coalib.bears.BearLogMessage import BearLogMessage
 from coalib.misc.Decorators import enforce_signature
 from coalib.settings.FunctionMetadata import FunctionMetadata
 from coalib.settings.Section import Section
-
 
 #TODO Dependencies?
 #TODO generate_repr: auto mode
@@ -36,20 +36,55 @@ class Bear:
 
             self.warn(error_string)
 
-    # TODO Use LogRecord from `logging` to generate log objects.
-    #      Mention that they are intended for use inside `run`.
     def debug(self, msg):
-        pass
+        """
+        Logs a debug message.
+
+        This method puts the message into `self.comq`.
+
+        :param msg: The log message.
+        """
+        self.log(BearLogMessage.debug(msg))
+
     def warn(self, msg):
-        pass
+        """
+        Logs a warning message.
+
+        This method puts the message into `self.comq`.
+
+        :param msg: The log message.
+        """
+        self.log(BearLogMessage.warn(msg))
+
     def info(self, msg):
-        pass
+        """
+        Logs an info message.
+
+        This method puts the message into `self.comq`.
+
+        :param msg: The log message.
+        """
+        self.log(BearLogMessage.info(msg))
+
     def error(self, msg):
-        pass
-    def log(self, level, msg):
-        pass
-        # TODO Logging calls propagate down here.
-        # TODO Actual logging
+        """
+        Logs an error message.
+
+        This method puts the message into `self.comq`.
+
+        :param msg: The log message.
+        """
+        self.log(BearLogMessage.error(msg))
+
+    def log(self, log_msg):
+        """
+        Logs a `LogBearMessage`.
+
+        This method puts the message into `self.comq`.
+
+        :param log_msg: The `BearLogMessage` that contains the log message.
+        """
+        self.queue.put(log_msg)
 
     # generate_tasks() yields arguments that get passed to execute(). The
     # pooling thread is responsible for calling execute() with the generated
